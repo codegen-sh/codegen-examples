@@ -2,23 +2,29 @@
 
 [![Documentation](https://img.shields.io/badge/docs-docs.codegen.com-blue)](https://docs.codegen.com)
 
-A collection of example transformations using [Codegen](https://github.com/codegen-sh/graph-sitter).
+This is a collection of examples using [Codegen](https://codegen.com). You can use these examples to learn how to use Codegen and build custom code transformations.
 
 ## Setup
 
 We recommend using [`uv`](https://github.com/astral-sh/uv) with Python 3.13 for the best experience.
 
+First, install uv if you haven't already
 ```bash
-# Install uv if you haven't already
 brew install uv
+```
 
-# Create and activate a Python 3.13 virtual environment
+Create and activate a Python 3.13 virtual environment
+```bash
 uv venv --python 3.13.0 && source .venv/bin/activate
+```
 
-# Install Codegen
+Install the `codegen` package
+```bash
 uv pip install codegen
+```
 
-# Optional: Install Jupyter for interactive exploration
+__Optional__: Install Jupyter for interactive exploration
+```bash
 uv pip install jupyterlab && jupyter lab
 ```
 
@@ -39,3 +45,7 @@ Each directory contains a self-contained example with:
 ## Contributing
 
 Have a useful example to share? We'd love to include it! Please see our [Contributing Guide](CONTRIBUTING.md) for instructions.
+
+## License
+
+The [Apache 2.0 license](LICENSE).

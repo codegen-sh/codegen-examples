@@ -1,4 +1,4 @@
-from codegen import Codebase
+from graph_sitter import Codebase
 
 # Initialize codebase
 codebase = Codebase("./")
@@ -54,7 +54,9 @@ def update_unicode_to_str(file):
 
     # Find and update Unicode string literals (u"...")
     for string_literal in file.find('u"'):
-        if string_literal.source.startswith('u"') or string_literal.source.startswith("u'"):
+        if string_literal.source.startswith('u"') or string_literal.source.startswith(
+            "u'"
+        ):
             print("🔤 Converting Unicode string literal to regular string")
             new_string = string_literal.source[1:]  # Remove the 'u' prefix
             string_literal.edit(new_string)
@@ -76,8 +78,14 @@ def update_exception_syntax(file):
         print(f"🔍 Processing {file.filepath}")
         for editable in file.find("except "):
             try:
-                if editable.source.lstrip().startswith("except") and ", " in editable.source and " as " not in editable.source:
-                    print(f"🔄 Found Python 2 style exception: {editable.source.strip()}")
+                if (
+                    editable.source.lstrip().startswith("except")
+                    and ", " in editable.source
+                    and " as " not in editable.source
+                ):
+                    print(
+                        f"🔄 Found Python 2 style exception: {editable.source.strip()}"
+                    )
                     parts = editable.source.split(",", 1)
                     new_source = f"{parts[0]} as{parts[1]}"
                     print(f"✨ Converting to: {new_source.strip()}")
@@ -109,7 +117,9 @@ def update_iterators(file):
             print("    🔄 Updating print statements to Python3 syntax")
             for stmt in cls.code_block.statements:
                 if 'print "' in stmt.source or "print '" in stmt.source:
-                    new_stmt = stmt.source.replace('print "', 'print("').replace("print '", "print('")
+                    new_stmt = stmt.source.replace('print "', 'print("').replace(
+                        "print '", "print('"
+                    )
                     if not new_stmt.strip().endswith(")"):
                         new_stmt = new_stmt.rstrip() + ")"
                     stmt.edit(new_stmt)

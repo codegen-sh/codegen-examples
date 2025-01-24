@@ -24,6 +24,15 @@ The migration focuses on these key updates:
    SQLAlchemy 2.0 introduces a new `lazy` parameter for relationship definitions. Update your relationships to use the new `lazy` parameter for improved performance.  
    [Run the Relationship Lazy Loading Codemod](https://www.codegen.sh/search/6512?skillType=codemod)
 
+5. **Type Annotations**
+   SQLAlchemy 2.0 has improved type annotation support. Update your models to include type hints for better IDE support and runtime type checking.
+
+   - Add type annotations to model attributes and relationships
+   - Leverage SQLAlchemy's typing module for proper type hints
+   - Enable better IDE autocompletion and type checking
+
+   [Run the Type Annotations Codemod](https://www.codegen.sh/search/4645?skillType=codemod)
+
 ---
 
 ## How to Migrate
@@ -66,6 +75,17 @@ The query API has been revamped in SQLAlchemy 2.0. Key updates include:
 SQLAlchemy 2.0 introduces a new `lazy` parameter for relationship definitions. Update your relationships to use the new `lazy` parameter for improved performance.
 
 👉 [Run the Relationship Lazy Loading Codemod](https://www.codegen.sh/search/6512?skillType=codemod)
+
+---
+
+### Step 5: Add Type Annotations
+SQLAlchemy 2.0 has improved type annotation support. Update your models to include type hints for better IDE support and runtime type checking.
+
+- Add type annotations to model attributes and relationships
+- Leverage SQLAlchemy's typing module for proper type hints
+- Enable better IDE autocompletion and type checking
+
+👉 [Run the Type Annotations Codemod](https://www.codegen.sh/search/4645?skillType=codemod)
 
 ---
 

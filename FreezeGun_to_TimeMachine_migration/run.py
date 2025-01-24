@@ -1,7 +1,6 @@
 from codegen import Codebase
 
-codebase = Codebase.from_repo(
-    "getmoto/moto", commit="786a8ada7ed0c7f9d8b04d49f24596865e4b7901")
+codebase = Codebase.from_repo("getmoto/moto", commit="786a8ada7ed0c7f9d8b04d49f24596865e4b7901")
 
 print("🚀 Starting FreezeGun to TimeMachine conversion...")
 

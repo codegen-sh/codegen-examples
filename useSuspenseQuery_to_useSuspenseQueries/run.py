@@ -19,7 +19,7 @@ def run_command(command, cwd=None):
 
 def main():
     # Clone ThreatMapper repository
-    print("\n🚀 Cloning ThreatMapper repository...")
+    print("\n🚀 Cloning deepfence/ThreatMapper repository...")
     if os.path.exists("ThreatMapper"):
         shutil.rmtree("ThreatMapper")
     run_command("git clone https://github.com/deepfence/ThreatMapper")

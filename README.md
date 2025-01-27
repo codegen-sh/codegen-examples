@@ -15,17 +15,12 @@ brew install uv
 
 Create and activate a Python 3.13 virtual environment
 ```bash
-uv venv --python 3.13.0 && source .venv/bin/activate
+uv venv && source .venv/bin/activate
 ```
 
 Install the `codegen` package
 ```bash
-uv pip install codegen
-```
-
-__Optional__: Install Jupyter for interactive exploration
-```bash
-uv pip install jupyterlab && jupyter lab
+uv sync
 ```
 
 ## Examples

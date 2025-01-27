@@ -1,7 +1,7 @@
 # tests/test_classes.py
 
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from jj_classes.castle import Castle
 from jj_classes.character import Character
 

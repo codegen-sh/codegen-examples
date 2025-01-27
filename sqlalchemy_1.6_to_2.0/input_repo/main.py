@@ -1,8 +1,7 @@
 # main.py
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-import models
-import schemas
+import models, schemas
 from database import SessionLocal, engine
 from typing import List
 

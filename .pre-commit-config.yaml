@@ -50,13 +50,13 @@ repos:
           - tomli
         files: ".*"
 
-  - repo: https://github.com/fpgmaas/deptry.git
-    rev: "0.23.0"
-    hooks:
-      - id: deptry
-        pass_filenames: false
-        always_run: true
-        entry: bash -c "uv run --frozen --all-extras --dev deptry . --ignore DEP001"
+  # - repo: https://github.com/fpgmaas/deptry.git
+  #   rev: "0.23.0"
+  #   hooks:
+  #     - id: deptry
+  #       pass_filenames: false
+  #       always_run: true
+  #       entry: bash -c "uv run --frozen --all-extras --dev deptry . --ignore DEP001"
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: "0.5.24"

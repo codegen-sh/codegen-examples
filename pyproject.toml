@@ -29,6 +29,7 @@ dev-dependencies = [
     "pre-commit-uv>=4.1.4",
     "uv>=0.4.25",
     "jupyterlab==4.3.4",
+    "deptry>=0.22.0",
 ]
 
 [tool.pre-commit-uv]

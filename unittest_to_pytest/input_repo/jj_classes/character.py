@@ -1,5 +1,6 @@
 # jj_classes/character.py
 
+
 class Character:
     """Defines the Character class."""
 

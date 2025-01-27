@@ -1,12 +1,10 @@
 # SQLAlchemy 1.6 to 2.0 Migration Example
 
-[![Documentation](https://img.shields.io/badge/docs-docs.codegen.com-blue)](https://docs.codegen.com/tutorials/sqlalchemy-1.6-to-2.0)
-
 This example demonstrates how to use Codegen to automatically migrate SQLAlchemy 1.6 code to the new 2.0-style query interface. For a complete walkthrough, check out our [tutorial](https://docs.codegen.com/tutorials/sqlalchemy-1.6-to-2.0).
 
-## What This Example Does
+## How the Migration Script Works
 
-The migration script handles four key transformations:
+The codemod script handles four key transformations:
 
 1. **Convert Query to Select**
    ```python
@@ -18,6 +16,7 @@ The migration script handles four key transformations:
        select(User).where(User.name == 'john')
    ).scalars().all()
    ```
+   This transformation replaces the legacy Query interface with the new Select-based API, providing better type safety and consistency.
 
 2. **Update Session Execution**
    ```python
@@ -29,6 +28,7 @@ The migration script handles four key transformations:
    users = session.execute(select(User)).scalars().all()
    first_user = session.execute(select(User)).scalars().first()
    ```
+   Session execution is updated to use the new execute() method, which provides clearer separation between SQL construction and execution.
 
 3. **Modernize ORM Relationships**
    ```python
@@ -42,6 +42,7 @@ The migration script handles four key transformations:
    class Address(Base):
        user = relationship("User", back_populates="addresses")
    ```
+   Relationships are modernized to use explicit back_populates instead of backref, making bidirectional relationships more maintainable and explicit.
 
 4. **Add Type Annotations**
    ```python
@@ -59,6 +60,7 @@ The migration script handles four key transformations:
        name: Mapped[str] = mapped_column()
        addresses: Mapped[List["Address"]] = relationship()
    ```
+   Type annotations are added using SQLAlchemy 2.0's Mapped[] syntax, enabling better IDE support and runtime type checking.
 
 ## Running the Example
 
@@ -70,13 +72,7 @@ pip install codegen
 python run.py
 ```
 
-The script will process all Python files in the `repo-before` directory and apply the transformations in the correct order.
-
-## Understanding the Code
-
-- `run.py` - The migration script
-- `repo-before/` - Sample SQLAlchemy 1.6 application to migrate
-- `guide.md` - Additional notes and explanations
+The script will process all Python files in the `input_repo` directory and apply the transformations in the correct order.
 
 ## Learn More
 

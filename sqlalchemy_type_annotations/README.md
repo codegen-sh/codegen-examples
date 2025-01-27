@@ -127,6 +127,28 @@ class Book(Base):
     )
 ```
 
+## Key Differences to Note
+
+1. **Import Changes**
+   - New imports required: `from typing import List, Optional`
+   - `Column` import is replaced with `mapped_column`
+   - New `Mapped` type wrapper is required
+
+2. **Column Definition Syntax**
+   - Old: `column_name = Column(type, **kwargs)`
+   - New: `column_name: Mapped[type] = mapped_column(**kwargs)`
+   - Type is moved from constructor to type annotation
+
+3. **Relationship Changes**
+   - `backref` parameter is deprecated in favor of explicit `back_populates`
+   - Relationships require type hints with `Mapped[List["Model"]]` or `Mapped[Optional["Model"]]`
+   - Forward references use string literals for model names
+
+4. **Nullable Handling**
+   - Nullable fields must use `Optional[type]` in type annotation
+   - Both the type annotation and `nullable=True` parameter are required
+   - Example: `field: Mapped[Optional[str]] = mapped_column(nullable=True)`
+
 ## Running the Migration
 
 ```bash

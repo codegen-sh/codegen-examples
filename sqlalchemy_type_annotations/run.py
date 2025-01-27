@@ -1,9 +1,26 @@
 import codegen
 from codegen import Codebase
 from codegen.sdk.core.detached_symbols.function_call import FunctionCall
+import subprocess
+import shutil
+import os
 
 
-@codegen.function("sqlalchemy-type-notations")
+def init_git_repo(repo_path: str) -> None:
+    """Initialize a git repository in the given path."""
+    subprocess.run(["git", "init"], cwd=repo_path, check=True)
+    subprocess.run(["git", "add", "."], cwd=repo_path, check=True)
+    subprocess.run(["git", "commit", "-m", "Initial commit"], cwd=repo_path, check=True)
+
+
+def cleanup_git_repo(repo_path: str) -> None:
+    """Remove the .git directory from the given path."""
+    git_dir = os.path.join(repo_path, ".git")
+    if os.path.exists(git_dir):
+        shutil.rmtree(git_dir)
+
+
+@codegen.function("sqlalchemy-type-annotations")
 def run(codebase: Codebase):
     """Add Mapped types to SQLAlchemy models in a codebase.
 
@@ -115,8 +132,15 @@ def run(codebase: Codebase):
 
 
 if __name__ == "__main__":
+    input_repo = "./input_repo"
+    print("Initializing git repository...")
+    init_git_repo(input_repo)
+
     print("Initializing codebase...")
-    codebase = Codebase.from_repo("vishalshenoy/codegen-typeannotations-example")
+    codebase = Codebase(input_repo)
 
     print("Running codemod...")
     run(codebase)
+
+    print("Cleaning up git repository...")
+    cleanup_git_repo(input_repo)

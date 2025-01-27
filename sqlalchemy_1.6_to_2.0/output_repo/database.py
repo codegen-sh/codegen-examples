@@ -1,6 +1,5 @@
 # database.py
 from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import sessionmaker
 
 SQLALCHEMY_DATABASE_URL = "postgresql://user:password@localhost/dbname"  # Change to your database URL

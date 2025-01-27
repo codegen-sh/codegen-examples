@@ -115,6 +115,7 @@ def update_iterators(file):
                         new_stmt = new_stmt.rstrip() + ")"
                     stmt.edit(new_stmt)
 
+
 @codegen.function("python2-to-python3")
 def run():
     """Main function to run the Python 2 to 3 conversion"""

@@ -93,8 +93,17 @@ def run(codebase: Codebase):
     print(f"Average dependencies: {training_data['metadata']['avg_dependencies']:.2f}")
     print(f"Average usages: {training_data['metadata']['avg_usages']:.2f}")
 
-    # Save as JSON
+    return training_data
+
+
+if __name__ == "__main__":
+    print("Initializing codebase...")
+    codebase = Codebase.from_repo("fastapi/fastapi")
+
+    print("Generating training data...")
+    training_data = run(codebase)
+
+    print("Saving training data...")
     with open("training_data.json", "w") as f:
         json.dump(training_data, f, indent=2)
-
-    return training_data
+    print("Training data saved to training_data.json")

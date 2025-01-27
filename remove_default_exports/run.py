@@ -2,6 +2,7 @@ import codegen
 from codegen import Codebase
 from codegen.sdk.typescript.file import TSFile
 
+
 @codegen.function("remove-default-exports")
 def run(codebase: Codebase):
     """Convert default exports to named exports in TypeScript files.
@@ -18,7 +19,7 @@ def run(codebase: Codebase):
             continue
 
         # Get corresponding non-shared file
-        non_shared_path = file.filepath.replace('/shared/', '/')
+        non_shared_path = file.filepath.replace("/shared/", "/")
         if not codebase.has_file(non_shared_path):
             print(f"⚠️ No matching non-shared file for: {non_shared_path}")
             continue
@@ -37,6 +38,7 @@ def run(codebase: Codebase):
                         default_export.make_non_default()
 
             print(f"✨ Fixed exports in {file.filepath}")
+
 
 if __name__ == "__main__":
     codebase = Codebase("./")

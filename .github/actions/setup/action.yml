@@ -1,0 +1,20 @@
+name: "Setup"
+description: "Setup tools for run"
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Install UV
+      uses: astral-sh/setup-uv@v5
+      id: setup-uv
+      with:
+        enable-cache: false
+        prune-cache: true
+        version: '0.5.21'
+        cache-dependency-glob: '**/uv.lock'
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        uv sync --frozen

@@ -1,4 +1,4 @@
-# FreezeGun to TimeMachine Migration Example
+ FreezeGun to TimeMachine Migration Example
 
 This example demonstrates how to use Codegen to automatically migrate test code from FreezeGun to TimeMachine for time mocking. The migration script makes this process simple by handling all the tedious manual updates automatically.
 
@@ -15,16 +15,14 @@ The script (`run.py`) automates the entire migration process in a few key steps:
    - Provides a simple SDK for making codebase-wide changes
    - Supports specific commit targeting for version control
 
-2. **Test File Processing**
+2. **Test File Detection**
    ```python
-   for file in codebase.files:
-       if "tests" not in file.filepath:
-           continue
-       print(f"📝 Processing: {file.filepath}")
+   if "tests" not in file.filepath:
+       continue
    ```
-   - Iterates through all files in the codebase
-   - Focuses only on test files where time mocking is used
-   - Provides helpful progress feedback during migration
+   - Automatically identifies test files using Codegen's file APIs
+   - Skips non-test files to avoid unnecessary processing
+   - Focuses changes where time mocking is most commonly used
 
 3. **Import Updates**
    ```python
@@ -32,27 +30,21 @@ The script (`run.py`) automates the entire migration process in a few key steps:
        if imp.symbol_name and 'freezegun' in imp.source:
            if imp.name == 'freeze_time':
                imp.edit('from time_machine import travel')
-           else:
-               imp.set_import_module('time_machine')
    ```
-   - Converts FreezeGun imports to TimeMachine equivalents
-   - Handles both direct imports (`freeze_time`) and other freezegun imports
-   - Uses Codegen's import APIs for precise updates
+   - Uses Codegen's import analysis to find and update imports
+   - Handles both direct and aliased imports
+   - Preserves import structure and formatting
 
 4. **Function Call Transformation**
    ```python
    for fcall in file.function_calls:
-       if fcall.name == 'freeze_time':
-           # Add tick=False if not present
-           if not fcall.get_arg_by_parameter_name('tick'):
-               fcall.set_kwarg('tick', 'False')
-           # Rename freeze_time to travel
-           fcall.rename('travel')
+       if 'freeze_time' not in fcall.source:
+           continue
+       # Transform freeze_time to travel with tick=False
    ```
-   - Identifies freeze_time calls using name matching
-   - Adds the required `tick=False` parameter using Codegen's argument APIs
-   - Renames the function calls from `freeze_time` to `travel`
-   - Commits changes after each transformation
+   - Uses Codegen's function call analysis to find all usages
+   - Adds required TimeMachine parameters
+   - Maintains existing arguments and formatting
 
 ## Why This Makes Migration Easy
 
@@ -128,7 +120,6 @@ traveller.stop()
 ```bash
 # Install Codegen
 pip install codegen
-
 # Run the migration
 python run.py
 ```

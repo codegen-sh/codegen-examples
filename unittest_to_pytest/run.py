@@ -2,10 +2,9 @@ import codegen
 from codegen import Codebase
 
 # Initialize codebase
-codebase = Codebase("./")
 
 # Define the target directory
-TARGET_DIR = "repo-before/tests"
+TARGET_DIR = "input_repo/tests"
 
 
 def remove_unittest_inheritance(file):
@@ -78,4 +77,5 @@ def run(codebase: Codebase):
 
 
 if __name__ == "__main__":
+    codebase = Codebase("./")
     run(codebase)

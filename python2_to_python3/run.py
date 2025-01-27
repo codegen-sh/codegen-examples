@@ -2,7 +2,6 @@ import codegen
 from codegen import Codebase
 
 # Initialize codebase
-codebase = Codebase("./")
 
 # Define the target directory
 TARGET_DIR = "input_repo"
@@ -151,4 +150,6 @@ def run():
 
 
 if __name__ == "__main__":
+    codebase = Codebase("./")
+
     run(codebase)

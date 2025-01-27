@@ -1,111 +1,104 @@
 # Transform useSuspenseQuery to useSuspenseQueries
 
-This codemod demonstrates how to convert multiple `useSuspenseQuery` calls to a single `useSuspenseQueries` calls in your React codebase. This conversion improves code readability and performance by batching multiple queries into a single call, reducing the number of re-renders and network requests.
+This example demonstrates how to use Codegen to automatically convert multiple `useSuspenseQuery` calls to a single `useSuspenseQueries` call in React codebases. The migration script makes this process simple by handling all the tedious manual updates automatically.
 
-This primarily leverages two APIs:
-- [`codebase.files`](/api-reference/Codebase#files) for finding relevant files
-- [`file.add_import_from_import_string(...)`](/codebase-sdk/core/File#add-import-from-import-string) for managing imports
+## How the Migration Script Works
 
-## Finding Files with useSuspenseQuery
+The script automates the entire migration process in a few key steps:
 
-To identify files that need updating, we can iterate through the codebase and check for the presence of `useSuspenseQuery`:
+1. **File Detection**
+   ```python
+   for file in codebase.files:
+       if "useSuspenseQuery" not in file.source:
+           continue
+   ```
+   - Automatically identifies files using `useSuspenseQuery`
+   - Skips irrelevant files to avoid unnecessary processing
+   - Uses Codegen's intelligent code analysis engine
 
-```python python
-# Iterate through all files in the codebase
-for file in codebase.files:
-    if "useSuspenseQuery" not in file.source:
-        continue
-    print(f"Found useSuspenseQuery in: {file.filepath}")
-```
+2. **Import Management**
+   ```python
+   import_str = "import { useQuery, useSuspenseQueries } from '@tanstack/react-query'"
+   file.add_import_from_import_string(import_str)
+   ```
+   - Uses Codegen's import analysis to add required imports
+   - Preserves existing import structure
+   - Handles import deduplication automatically
 
-## Managing Import Statements
+3. **Query Transformation**
+   ```python
+   # Convert multiple queries to single useSuspenseQueries call
+   new_query = f"const [{', '.join(results)}] = useSuspenseQueries({{queries: [{', '.join(queries)}]}})"
+   ```
+   - Collects multiple `useSuspenseQuery` calls
+   - Combines them into a single `useSuspenseQueries` call
+   - Maintains variable naming and query configurations
 
-Before making changes, we need to ensure the correct imports are present:
+## Why This Makes Migration Easy
 
-```python python
-# Define the required import statement
-import_str = "import { useQuery, useSuspenseQueries } from '@tanstack/react-query'"
+1. **Zero Manual Updates**
+   - Codegen SDK handles all the file searching and updating
+   - No tedious copy-paste work
 
-# Add import to relevant files
-for file in codebase.files:
-    if "useSuspenseQuery" in file.source:
-        file.add_import_from_import_string(import_str)
-        print(f"Added import to {file.filepath}")
-```
+2. **Consistent Changes**
+   - Ensures all transformations follow the same patterns
+   - Maintains code style consistency
 
-## Converting Query Calls
+3. **Safe Transformations**
+   - Validates changes before applying them
+   - Easy to review and revert if needed
 
-The main transformation involves collecting multiple `useSuspenseQuery` calls and converting them to a single `useSuspenseQueries` call:
+## Common Migration Patterns
 
-```python python
-# Iterate through functions in the file
-for function in file.functions:
-    if "useSuspenseQuery" not in function.source:
-        continue
-
-    results = []  # Store variable names
-    queries = []  # Store query configurations
-    old_statements = []  # Track statements to replace
-
-    # Find useSuspenseQuery assignments
-    for assignment in function.code_block.assignment_statements:
-        if not isinstance(assignment.right, FunctionCall):
-            continue
-
-        fcall = assignment.right
-        if fcall.name != "useSuspenseQuery":
-            continue
-
-        old_statements.append(assignment)
-        results.append(assignment.left.source)
-        queries.append(fcall.args[0].value.source)
-
-    # Convert to useSuspenseQueries if needed
-    if old_statements:
-        new_query = f"const [{', '.join(results)}] = useSuspenseQueries({{queries: [{', '.join(queries)}]}})"
-        
-        # Replace old statements with new query
-        for assignment in old_statements:
-            assignment.edit(new_query)
-```
-
-## Example Transformation
-
-Here's an example of how the code transformation works:
-
-Before:
+### Multiple Query Calls
 ```typescript
+// Before
 const result1 = useSuspenseQuery(queryConfig1)
 const result2 = useSuspenseQuery(queryConfig2)
 const result3 = useSuspenseQuery(queryConfig3)
-```
 
-After:
-```typescript
+// Automatically converted to:
 const [result1, result2, result3] = useSuspenseQueries({
   queries: [queryConfig1, queryConfig2, queryConfig3]
 })
 ```
 
-## Running the Transformation
+## Key Benefits to Note
 
-1. Install the codegen package:
-    ```bash
-    pip install codegen
-    ```
+1. **Reduced Re-renders**
+   - Single query call instead of multiple separate calls
+   - Better React performance
 
-2. Run the codemod:
-    ```bash
-    python3 run.py
-    ```
+2. **Improved Code Readability**
+   - Cleaner, more consolidated query logic
+   - Easier to maintain and understand
 
-This will:
-1. Initialize the codebase from the target repository
-2. Find and process files containing `useSuspenseQuery`
+3. **Network Optimization**
+   - Batched query requests
+   - Better resource utilization
+
+## Running the Migration
+
+```bash
+# Install Codegen
+pip install codegen
+
+# Run the migration
+python run.py
+```
+
+The script will:
+1. Initialize the codebase
+2. Find files containing `useSuspenseQuery`
 3. Apply the transformations
-4. Print detailed information to the terminal, including:
-   - Files being processed
-   - Before/after diffs for each transformation
-   - Summary statistics of modified files and functions
+4. Print detailed progress information
 
-The script will output progress and changes to the terminal as it runs, allowing you to review each transformation in real-time.
+## Learn More
+
+- [React Query Documentation](https://tanstack.com/query/latest)
+- [useSuspenseQueries API](https://tanstack.com/query/latest/docs/react/reference/useSuspenseQueries)
+- [Codegen Documentation](https://docs.codegen.com)
+
+## Contributing
+
+Feel free to submit issues and enhancement requests!

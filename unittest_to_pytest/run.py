@@ -1,3 +1,4 @@
+import codegen
 from codegen import Codebase
 
 # Initialize codebase
@@ -52,8 +53,8 @@ def {fixture_name}():
             setup_method.remove()
             print(f"🗑️ Removed setUp method from class {cls.name}")
 
-
-def main():
+@codegen.function("unittest-to-pytest")
+def run(codebase: Codebase):
     """Main function to run the unittest to pytest conversion"""
     print("🚀 Starting unittest to pytest conversion...")
 
@@ -76,4 +77,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run(codebase)

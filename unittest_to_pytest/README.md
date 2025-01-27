@@ -1,12 +1,10 @@
-# unittest to pytest Migration Example
+# Unittest to Pytest Migration Example
 
-[![Documentation](https://img.shields.io/badge/docs-docs.codegen.com-blue)](https://docs.codegen.com/tutorials/unittest-to-pytest)
+This codemod demonstrates how to automatically migrate `unittest` test suites to `pytest` using Codegen. The migration script simplifies the process by handling all the tedious manual updates automatically.
 
-This example demonstrates how to use Codegen to automatically migrate unittest test suites to pytest. For a complete walkthrough, check out our [tutorial](https://docs.codegen.com/tutorials/unittest-to-pytest).
+## How the Migration Script Works
 
-## What This Example Does
-
-The migration script handles four key transformations:
+The script automates the entire migration process in a few key steps:
 
 1. **Convert Test Classes and Setup Methods**
    ```python
@@ -29,6 +27,8 @@ The migration script handles four key transformations:
        user = db.create_user("test")
        assert user.name == "test"
    ```
+   - Converts `unittest.TestCase` classes to standalone functions
+   - Replaces `setUp` methods with `pytest` fixtures
 
 2. **Update Assertions**
    ```python
@@ -45,6 +45,8 @@ The migration script handles four key transformations:
        with pytest.raises(ValueError):
            parse_id("invalid")
    ```
+   - Replaces `unittest` assertions with `pytest` assertions
+   - Uses `pytest.raises` for exception testing
 
 3. **Convert Test Discovery**
    ```python
@@ -55,6 +57,8 @@ The migration script handles four key transformations:
    # To:
    # Remove unittest.main() and rename files to test_*.py
    ```
+   - Removes `unittest.main()` calls
+   - Ensures files are named for `pytest` discovery
 
 4. **Modernize Fixtures**
    ```python
@@ -68,8 +72,9 @@ The migration script handles four key transformations:
    def conn():
        return create_db()
    ```
+   - Converts class-level setup to session-scoped fixtures
 
-## Running the Example
+## Running the Migration
 
 ```bash
 # Install Codegen
@@ -84,7 +89,7 @@ The script will process all Python test files in the `repo-before` directory and
 ## Understanding the Code
 
 - `run.py` - The migration script
-- `repo-before/` - Sample unittest test suite to migrate
+- `repo-before/` - Sample `unittest` test suite to migrate
 - `guide.md` - Additional notes and explanations
 
 ## Learn More
@@ -92,4 +97,8 @@ The script will process all Python test files in the `repo-before` directory and
 - [Full Tutorial](https://docs.codegen.com/tutorials/unittest-to-pytest)
 - [pytest Documentation](https://docs.pytest.org/)
 - [unittest Documentation](https://docs.python.org/3/library/unittest.html)
-- [Codegen Documentation](https://docs.codegen.com) 
+- [Codegen Documentation](https://docs.codegen.com)
+
+## Contributing
+
+Feel free to submit issues and enhancement requests! 

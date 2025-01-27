@@ -105,51 +105,23 @@ class Book(Base):
 
 ## Running the Transformation
 
-1. Create a virtual environment:
+1. Install the codegen package:
     ```bash
-    uv venv
+    pip install codegen
     ```
 
-2. Activate the virtual environment:
-    - On Unix/macOS:
-        ```bash
-        source .venv/bin/activate
-        ```
-    - On Windows:
-        ```bash
-        .\.venv\Scripts\activate
-        ```
-
-3. Install dependencies:
-    ```bash
-    uv pip install codegen
-    ```
-
-4. Run the codemod:
+2. Run the codemod:
     ```bash
     python3 run.py
     ```
 
 This will:
-1. Initialize a git repository in the example directory
-2. Apply the type annotation transformations
-3. Show a diff of the changes made
-4. Clean up the temporary git repository
+1. Initialize the codebase from the target repository
+2. Find and process files containing `useSuspenseQuery`
+3. Apply the transformations
+4. Print detailed information to the terminal, including:
+   - Files being processed
+   - Before/after diffs for each transformation
+   - Summary statistics of modified files and functions
 
-<Note>
-The script includes cleanup steps to remove temporary files after the transformation is complete.
-</Note>
-
-## Verifying Changes
-
-After running the transformation, you can verify the changes:
-
-```bash
-# Show status of changed files
-git status
-
-# Show detailed changes
-git diff
-```
-
-This will display all modified files and the specific changes made within each file.
+The script will output progress and changes to the terminal as it runs, allowing you to review each transformation in real-time.

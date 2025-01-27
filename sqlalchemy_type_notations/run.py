@@ -1,84 +1,122 @@
-import os
-import subprocess
-import shutil
-from pathlib import Path
+import codegen
+from codegen import Codebase
+from codegen.sdk.core.detached_symbols.function_call import FunctionCall
 
-def run_command(cmd, cwd=None):
-    """Run a shell command and return output"""
-    try:
-        result = subprocess.run(
-            cmd,
-            cwd=cwd,
-            shell=True,
-            check=True,
-            capture_output=True,
-            text=True
-        )
-        return result.stdout
-    except subprocess.CalledProcessError as e:
-        print(f"Error running command: {cmd}")
-        print(f"Error output: {e.stderr}")
-        raise
 
-def setup_git_repo(repo_path):
-    """Initialize git repo and make initial commit"""
-    print("🔧 Setting up git repository...")
-    run_command("git init", cwd=repo_path)
-    run_command("git add .", cwd=repo_path)
-    run_command('git commit -m "Initial commit"', cwd=repo_path)
-    print("✅ Git repository initialized and initial commit made")
+@codegen.function("sqlalchemy-type-notations")
+def run(codebase: Codebase):
+    """Add Mapped types to SQLAlchemy models in a codebase.
 
-def run_codemod(repo_path):
-    """Run the codemod script"""
-    print("\n🚀 Running codemod script...")
-    codemod_path = os.path.join(repo_path, "codemod.py")
-    run_command(f"python {codemod_path}", cwd=repo_path)
-    print("✅ Codemod script completed")
+    This codemod:
+    1. Finds all SQLAlchemy model classes
+    2. Converts Column type annotations to Mapped types
+    3. Adds necessary imports for the new type annotations
+    """
+    # Define type mapping
+    column_type_to_mapped_type = {
+        "Integer": "Mapped[int]",
+        "Optional[Integer]": "Mapped[int | None]",
+        "Boolean": "Mapped[bool]",
+        "Optional[Boolean]": "Mapped[bool | None]",
+        "DateTime": "Mapped[datetime | None]",
+        "Optional[DateTime]": "Mapped[datetime | None]",
+        "String": "Mapped[str]",
+        "Optional[String]": "Mapped[str | None]",
+        "Numeric": "Mapped[Decimal]",
+        "Optional[Numeric]": "Mapped[Decimal | None]",
+    }
 
-def get_git_diff(repo_path):
-    """Get the git diff of changes"""
-    print("\n📝 Getting diff of changes...")
-    return run_command("git diff HEAD", cwd=repo_path)
+    # Track statistics
+    classes_modified = 0
+    attributes_modified = 0
 
-def cleanup_git(repo_path):
-    """Remove git repository"""
-    print("\n🧹 Cleaning up git repository...")
-    git_dir = os.path.join(repo_path, ".git")
-    if os.path.exists(git_dir):
-        shutil.rmtree(git_dir)
-    print("✅ Git repository removed")
+    # Traverse the codebase classes
+    for cls in codebase.classes:
+        class_modified = False
+        original_source = cls.source  # Store original source before modifications
 
-def main():
-    # Path to the example directory
-    example_dir = os.path.join(os.path.dirname(__file__), "example")
-    
-    try:
-        # Ensure we're starting clean
-        cleanup_git(example_dir)
-        
-        # Setup git repo and run codemod
-        setup_git_repo(example_dir)
-        run_codemod(example_dir)
-        
-        # Get and display the diff
-        diff = get_git_diff(example_dir)
-        if diff:
-            print("\n📊 Changes made by codemod:")
-            print("=" * 80)
-            print(diff)
-            print("=" * 80)
-        else:
-            print("\n📊 No changes were made by the codemod")
-            
-        # Cleanup
-        cleanup_git(example_dir)
-        print("\n✨ Process completed successfully!")
-        
-    except Exception as e:
-        print(f"\n❌ Error: {str(e)}")
-        # Ensure cleanup happens even if there's an error
-        cleanup_git(example_dir)
-        raise
+        for attribute in cls.attributes:
+            if not attribute.assignment:
+                continue
+
+            assignment_value = attribute.assignment.value
+            if not isinstance(assignment_value, FunctionCall):
+                continue
+
+            if assignment_value.name != "Column":
+                continue
+
+            db_column_call = assignment_value
+
+            # Make sure we have at least one argument (the type)
+            if len(db_column_call.args) == 0:
+                continue
+
+            # Check for nullable=True
+            is_nullable = any(
+                x.name == "nullable" and x.value == "True" for x in db_column_call.args
+            )
+
+            # Extract the first argument for the column type
+            first_argument = db_column_call.args[0].source or ""
+            first_argument = first_argument.split("(")[0].strip()
+
+            # If the type is namespaced (e.g. sa.Integer), get the last part
+            if "." in first_argument:
+                first_argument = first_argument.split(".")[-1]
+
+            # If nullable, wrap the type in Optional[...]
+            if is_nullable:
+                first_argument = f"Optional[{first_argument}]"
+
+            # Check if we have a corresponding mapped type
+            if first_argument not in column_type_to_mapped_type:
+                print(f"Skipping unmapped type: {first_argument}")
+                continue
+
+            # Build the new mapped type annotation
+            new_type = column_type_to_mapped_type[first_argument]
+
+            # Update the assignment type annotation
+            attribute.assignment.set_type_annotation(new_type)
+            attributes_modified += 1
+            class_modified = True
+
+            # Add necessary imports
+            if not cls.file.has_import("Mapped"):
+                cls.file.add_import_from_import_string(
+                    "from sqlalchemy.orm import Mapped\n"
+                )
+
+            if "Optional" in new_type and not cls.file.has_import("Optional"):
+                cls.file.add_import_from_import_string("from typing import Optional\n")
+
+            if "Decimal" in new_type and not cls.file.has_import("Decimal"):
+                cls.file.add_import_from_import_string("from decimal import Decimal\n")
+
+            if "datetime" in new_type and not cls.file.has_import("datetime"):
+                cls.file.add_import_from_import_string(
+                    "from datetime import datetime\n"
+                )
+
+        if class_modified:
+            classes_modified += 1
+            # Print the diff for this class
+            print(f"\nModified class: {cls.name}")
+            print("Before:")
+            print(original_source)
+            print("\nAfter:")
+            print(cls.source)
+            print("-" * 80)
+
+    print("\nModification complete:")
+    print(f"Classes modified: {classes_modified}")
+    print(f"Attributes modified: {attributes_modified}")
+
 
 if __name__ == "__main__":
-    main()
+    print("Initializing codebase...")
+    codebase = Codebase.from_repo("vishalshenoy/codegen-typeannotations-example")
+
+    print("Running codemod...")
+    run(codebase)

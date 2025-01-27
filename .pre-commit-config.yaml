@@ -48,26 +48,8 @@ repos:
       - id: codespell
         additional_dependencies:
           - tomli
-        files: "docs/.*/.*.mdx"
+        files: ".*"
 
-  - repo: https://github.com/fpgmaas/deptry.git
-    rev: "0.23.0"
-    hooks:
-      - id: deptry
-        pass_filenames: false
-        always_run: true
-        entry: bash -c "uv run --frozen --all-extras --dev deptry src --ignore DEP001"
-  - repo: "local"
-    hooks:
-      - id: disallowed-words-check
-        name: Check for disallowed words
-        entry: scripts/disallowed-words-check.sh
-        language: script
-        files: ''  # Check all files
-  - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 39.120.4
-    hooks:
-      - id: renovate-config-validator
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: "0.5.24"
     hooks:

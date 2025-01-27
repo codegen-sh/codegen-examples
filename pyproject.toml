@@ -4,7 +4,7 @@ version = "0.0.0"
 readme = "README.md"
 requires-python = ">=3.12, <3.14"
 dependencies = [
-    "codegen==0.5.3"
+    "codegen==0.5.3",
 ]
 license = {file = "LICENSE"}
 classifiers = [
@@ -28,10 +28,14 @@ dev-dependencies = [
     "pre-commit>=4.0.1",
     "pre-commit-uv>=4.1.4",
     "uv>=0.4.25",
+    "jupyterlab==4.3.4",
+    "deptry>=0.22.0",
 ]
 
 [tool.pre-commit-uv]
-cache-keys = [{ git = { commit = true, tags = true } }]
 requirements = [
     "strict-requirements",
 ]
+
+[tool.deptry]
+package_module_name_map.codegen = "codegen"

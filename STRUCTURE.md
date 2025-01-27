@@ -62,15 +62,32 @@ Your `run.py` should follow this structure, demonstrated well in the `generate_t
 
 ## Working with Codebases
 
-Prefer using public repositories for examples when possible:
+Prefer using public repositories for examples when possible. However, sometimes you need a specific code structure to demonstrate a concept clearly. Here's how to handle both cases:
 
 ```python
-# Preferred: Use a well-known public repo
+# Preferred: Use a well-known public repo that demonstrates the concept well
 codebase = Codebase.from_repo("fastapi/fastapi")
 
-# Alternative: Use local repo for specific cases
-codebase = Codebase.from_directory("repo-before")
+# Alternative: Create a minimal example repo when you need specific code structure
+# 1. Create an input_repo/ directory in your example
+# 2. Add minimal code that clearly demonstrates the transformation
+codebase = Codebase("./input_repo")
 ```
+
+For example:
+```
+example-name/
+├── README.md
+├── run.py
+└── input_repo/     # Your minimal example code
+    ├── app.py
+    └── utils.py
+```
+
+Choose between these approaches based on:
+1. Can you find a public repo that clearly shows the concept?
+2. Is the transformation specific enough that a custom example would be clearer?
+3. Would a minimal example be more educational than a complex real-world one?
 
 ## Best Practices
 
@@ -134,9 +151,10 @@ Every example should include:
 1. **README.md**
    - Clear explanation of purpose
    - Explains key syntax and program function
-   - Code examples showing transformations
+   - Code examples showing the transformation (before/after)
+   - If using `input_repo/`, explain its structure and contents
    - Output format (if applicable)
-
+   - Setup and running instructions
 
 ## Testing Your Example
 

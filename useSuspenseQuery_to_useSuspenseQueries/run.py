@@ -1,70 +1,88 @@
-import os
-import subprocess
-import shutil
+import codegen
+from codegen import Codebase
+from codegen.sdk.core.detached_symbols.function_call import FunctionCall
 
 
-def run_command(command, cwd=None):
-    """Run a shell command and return output"""
-    try:
-        result = subprocess.run(
-            command, cwd=cwd, shell=True, check=True, capture_output=True, text=True
-        )
-        print(f"✅ {command}")
-        return result.stdout
-    except subprocess.CalledProcessError as e:
-        print(f"❌ {command} failed:")
-        print(e.stderr)
-        raise
+@codegen.function("useSuspenseQuery-to-useSuspenseQueries")
+def run(codebase: Codebase):
+    """Convert useSuspenseQuery calls to useSuspenseQueries in a React codebase.
 
+    This codemod:
+    1. Finds all files containing useSuspenseQuery
+    2. Adds the necessary import statement
+    3. Converts multiple useSuspenseQuery calls to a single useSuspenseQueries call
+    """
+    # Import statement for useSuspenseQueries
+    import_str = "import { useQuery, useSuspenseQueries } from '@tanstack/react-query'"
 
-def main():
-    # Clone ThreatMapper repository
-    print("\n🚀 Cloning deepfence/ThreatMapper repository...")
-    if os.path.exists("ThreatMapper"):
-        shutil.rmtree("ThreatMapper")
-    run_command("git clone https://github.com/deepfence/ThreatMapper")
+    # Track statistics
+    files_modified = 0
+    functions_modified = 0
 
-    repo_path = os.path.join(os.getcwd(), "ThreatMapper")
+    # Iterate through all files in the codebase
+    for file in codebase.files:
+        if "useSuspenseQuery" not in file.source:
+            continue
 
-    # Create and activate virtual environment
-    print("\n🔧 Setting up virtual environment...")
-    run_command("python3 -m venv venv", cwd=repo_path)
-    run_command("source venv/bin/activate", cwd=repo_path)
+        print(f"Processing {file.filepath}")
+        # Add the import statement
+        file.add_import_from_import_string(import_str)
+        file_modified = False
 
-    # Install codegen in the virtual environment
-    venv_pip = os.path.join(repo_path, "venv", "bin", "pip")
-    run_command(f"{venv_pip} install codegen")
+        # Iterate through all functions in the file
+        for function in file.functions:
+            if "useSuspenseQuery" not in function.source:
+                continue
 
-    # Copy codemod.py to the repository
-    print("\n📝 Creating codemod.py...")
-    codemod_source = os.path.join(os.getcwd(), "codemod.py")
-    codemod_dest = os.path.join(repo_path, "codemod.py")
-    shutil.copy2(codemod_source, codemod_dest)
+            results = []  # Store left-hand side of assignments
+            queries = []  # Store query arguments
+            old_statements = []  # Track statements to replace
 
-    # Run the codemod
-    print("\n🔄 Running codemod...")
-    venv_python = os.path.join(repo_path, "venv", "bin", "python")
-    run_command(f"{venv_python} codemod.py", cwd=repo_path)
+            # Find useSuspenseQuery assignments
+            for stmt in function.code_block.assignment_statements:
+                if not isinstance(stmt.right, FunctionCall):
+                    continue
 
-    # Show git status
-    print("\n📊 Git status:")
-    run_command("git status", cwd=repo_path)
+                fcall = stmt.right
+                if fcall.name != "useSuspenseQuery":
+                    continue
 
-    # Show git diff
-    print("\n📝 Changes made:")
-    try:
-        diff_output = run_command("git diff", cwd=repo_path)
-        print(diff_output)
-    except subprocess.CalledProcessError:
-        print("Unable to show diff")
+                old_statements.append(stmt)
+                results.append(stmt.left.source)
+                queries.append(fcall.args[0].value.source)
 
-    # Clean up by removing the ThreatMapper repository
-    print("\n🧹 Cleaning up...")
-    repo_folder = os.path.join(os.getcwd(), "ThreatMapper")
-    if os.path.exists(repo_folder):
-        shutil.rmtree(repo_folder)
-        print("Removed ThreatMapper repository")
+            # Convert to useSuspenseQueries if needed
+            if old_statements:
+                new_query = f"const [{', '.join(results)}] = useSuspenseQueries({{queries: [{', '.join(queries)}]}})"
+                print(
+                    f"Converting useSuspenseQuery to useSuspenseQueries in {function.name}"
+                )
+
+                # Print the diff
+                print("\nOriginal code:")
+                print("\n".join(stmt.source for stmt in old_statements))
+                print("\nNew code:")
+                print(new_query)
+                print("-" * 50)
+
+                # Replace old statements with new query
+                for stmt in old_statements:
+                    stmt.edit(new_query)
+
+                functions_modified += 1
+                file_modified = True
+
+        if file_modified:
+            files_modified += 1
+
+    print("\nModification complete:")
+    print(f"Files modified: {files_modified}")
+    print(f"Functions modified: {functions_modified}")
 
 
 if __name__ == "__main__":
-    main()
+    print("Initializing codebase...")
+    codebase = Codebase.from_repo("deepfence/ThreatMapper")
+
+    print("Running codemod...")
+    run(codebase)

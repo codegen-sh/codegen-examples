@@ -12,14 +12,8 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
-
-      - name: Setup backend
+      - uses: actions/checkout@v4
+      - name: Setup
         id: setup
         uses: ./.github/actions/setup
 

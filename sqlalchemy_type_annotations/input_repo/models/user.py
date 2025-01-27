@@ -1,4 +1,3 @@
-from sqlalchemy.orm import Mapped
 
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship

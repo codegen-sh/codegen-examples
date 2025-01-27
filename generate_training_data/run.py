@@ -81,12 +81,8 @@ def run(codebase: Codebase):
     # Update metadata
     training_data["metadata"]["total_processed"] = len(training_data["functions"])
     if training_data["functions"]:
-        training_data["metadata"]["avg_dependencies"] = sum(
-            len(f["dependencies"]) for f in training_data["functions"]
-        ) / len(training_data["functions"])
-        training_data["metadata"]["avg_usages"] = sum(
-            len(f["usages"]) for f in training_data["functions"]
-        ) / len(training_data["functions"])
+        training_data["metadata"]["avg_dependencies"] = sum(len(f["dependencies"]) for f in training_data["functions"]) / len(training_data["functions"])
+        training_data["metadata"]["avg_usages"] = sum(len(f["usages"]) for f in training_data["functions"]) / len(training_data["functions"])
 
     # Print stats
     print(f"Processed {training_data['metadata']['total_processed']} functions")

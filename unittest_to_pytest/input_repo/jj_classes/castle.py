@@ -1,5 +1,6 @@
 # jj_classes/castle.py
 
+
 class Castle:
     """Defines the Castle class."""
 

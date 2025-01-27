@@ -10,6 +10,7 @@ from typing import List
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
+
 # Dependency for the database session
 def get_db():
     db = SessionLocal()
@@ -18,7 +19,9 @@ def get_db():
     finally:
         db.close()
 
+
 # CRUD Operations
+
 
 @app.post("/books/", response_model=schemas.Book)
 def create_book(book: schemas.BookCreate, db: Session = Depends(get_db)):
@@ -28,10 +31,12 @@ def create_book(book: schemas.BookCreate, db: Session = Depends(get_db)):
     db.refresh(db_book)
     return db_book
 
+
 @app.get("/books/", response_model=List[schemas.Book])
 def read_books(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     books = db.query()(models.Book).offset(skip).limit(limit).scalars().all()
     return books
+
 
 @app.get("/books/{book_id}", response_model=schemas.Book)
 def read_book(book_id: int, db: Session = Depends(get_db)):
@@ -39,6 +44,7 @@ def read_book(book_id: int, db: Session = Depends(get_db)):
     if book is None:
         raise HTTPException(status_code=404, detail="Book not found")
     return book
+
 
 @app.put("/books/{book_id}", response_model=schemas.Book)
 def update_book(book_id: int, book: schemas.BookCreate, db: Session = Depends(get_db)):
@@ -51,6 +57,7 @@ def update_book(book_id: int, book: schemas.BookCreate, db: Session = Depends(ge
     db.refresh(db_book)
     return db_book
 
+
 @app.delete("/books/{book_id}", response_model=schemas.Book)
 def delete_book(book_id: int, db: Session = Depends(get_db)):
     db_book = db.query()(models.Book).where(models.Book.id == book_id).first()
@@ -60,6 +67,7 @@ def delete_book(book_id: int, db: Session = Depends(get_db)):
     db.commit()
     return db_book
 
+
 @app.post("/publishers/", response_model=schemas.Publisher)
 def create_publisher(publisher: schemas.PublisherCreate, db: Session = Depends(get_db)):
     db_publisher = models.Publisher(**publisher.dict())
@@ -68,10 +76,12 @@ def create_publisher(publisher: schemas.PublisherCreate, db: Session = Depends(g
     db.refresh(db_publisher)
     return db_publisher
 
+
 @app.get("/publishers/", response_model=List[schemas.Publisher])
 def read_publishers(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     publishers = db.query()(models.Publisher).offset(skip).limit(limit).scalars().all()
     return publishers
+
 
 @app.get("/publishers/{publisher_id}", response_model=schemas.Publisher)
 def read_publisher(publisher_id: int, db: Session = Depends(get_db)):
@@ -79,6 +89,7 @@ def read_publisher(publisher_id: int, db: Session = Depends(get_db)):
     if not publisher:
         raise HTTPException(status_code=404, detail="Publisher not found")
     return publisher
+
 
 @app.put("/publishers/{publisher_id}", response_model=schemas.Publisher)
 def update_publisher(publisher_id: int, publisher: schemas.PublisherCreate, db: Session = Depends(get_db)):
@@ -91,6 +102,7 @@ def update_publisher(publisher_id: int, publisher: schemas.PublisherCreate, db: 
     db.refresh(db_publisher)
     return db_publisher
 
+
 @app.delete("/publishers/{publisher_id}", response_model=schemas.Publisher)
 def delete_publisher(publisher_id: int, db: Session = Depends(get_db)):
     db_publisher = db.query()(models.Publisher).where(models.Publisher.id == publisher_id).first()
@@ -99,4 +111,3 @@ def delete_publisher(publisher_id: int, db: Session = Depends(get_db)):
     db.delete(db_publisher)
     db.commit()
     return db_publisher
-

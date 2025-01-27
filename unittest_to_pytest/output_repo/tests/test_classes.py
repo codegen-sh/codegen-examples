@@ -7,13 +7,12 @@ from jj_classes.castle import Castle
 from jj_classes.character import Character
 
 
-class TestCastle():
+class TestCastle:
     """Tests for the Castle class."""
+
     @pytest.fixture
     def setup_testcastle():
         castle = Castle("Test Castle")
-    
-
 
     def test_castle_name(setup_testcastle, Castle):
         """Test that the castle name is set correctly."""
@@ -43,13 +42,12 @@ class TestCastle():
             Castle("")
 
 
-class TestCharacter():
+class TestCharacter:
     """Tests for the Character class."""
+
     @pytest.fixture
     def setup_testcharacter():
         character = Character("Mario")
-    
-
 
     def test_character_name(setup_testcharacter, Character):
         """Test that the character name is set correctly."""
@@ -72,11 +70,10 @@ class TestCharacter():
 
 class TestCastleAndCharacter(unittest.TestCase):
     """Tests for the interaction between Castle and Character."""
+
     @pytest.fixture
     def setup_testcastleandcharacter():
         character = Character("Mario")
-    
-
 
     def test_character_has_access(setup_testcastleandcharacter, Character):
         """Test that a character with the correct powerup has access."""

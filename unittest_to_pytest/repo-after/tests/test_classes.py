@@ -2,7 +2,7 @@
 
 import pytest
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 from jj_classes.castle import Castle
 from jj_classes.character import Character
 

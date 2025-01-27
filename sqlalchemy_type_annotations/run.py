@@ -1,4 +1,6 @@
 import codegen
+
+
 from codegen import Codebase
 from codegen.sdk.core.detached_symbols.function_call import FunctionCall
 import subprocess
@@ -70,9 +72,7 @@ def run(codebase: Codebase):
                 continue
 
             # Check for nullable=True
-            is_nullable = any(
-                x.name == "nullable" and x.value == "True" for x in db_column_call.args
-            )
+            is_nullable = any(x.name == "nullable" and x.value == "True" for x in db_column_call.args)
 
             # Extract the first argument for the column type
             first_argument = db_column_call.args[0].source or ""
@@ -101,9 +101,7 @@ def run(codebase: Codebase):
 
             # Add necessary imports
             if not cls.file.has_import("Mapped"):
-                cls.file.add_import_from_import_string(
-                    "from sqlalchemy.orm import Mapped\n"
-                )
+                cls.file.add_import_from_import_string("from sqlalchemy.orm import Mapped\n")
 
             if "Optional" in new_type and not cls.file.has_import("Optional"):
                 cls.file.add_import_from_import_string("from typing import Optional\n")
@@ -112,9 +110,7 @@ def run(codebase: Codebase):
                 cls.file.add_import_from_import_string("from decimal import Decimal\n")
 
             if "datetime" in new_type and not cls.file.has_import("datetime"):
-                cls.file.add_import_from_import_string(
-                    "from datetime import datetime\n"
-                )
+                cls.file.add_import_from_import_string("from datetime import datetime\n")
 
         if class_modified:
             classes_modified += 1

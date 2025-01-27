@@ -21,6 +21,10 @@ classifiers = [
 
 [tool.ruff]
 line-length = 200
+exclude = [
+    "**/input_repo/**",
+    "**/output_repo/**",
+]
 
 [tool.uv]
 cache-keys = [{ git = { commit = true, tags = true } }]

@@ -1,0 +1,57 @@
+default_language_version:
+  python: python3.12
+fail_fast: true
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.3
+    hooks:
+      # Run the linter.
+      - id: ruff
+        types_or: [python, jupyter, pyi]
+        args: [--fix]
+
+      # Run the formatter.
+      - id: ruff-format
+        types_or: [python, jupyter, pyi]
+
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.8.1
+    hooks:
+      - id: nbstripout
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: tests/
+        exclude_types: [mdx, pyi]
+      - id: check-yaml
+      - id: end-of-file-fixer
+        files: .*/expected_diff.patch
+      - id: check-merge-conflict
+
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.31.0
+    hooks:
+      - id: check-github-workflows
+      - id: check-github-actions
+        args: ["--verbose"]
+
+  - repo: https://github.com/mxr/sync-pre-commit-deps
+    rev: v0.0.3
+    hooks:
+      - id: sync-pre-commit-deps
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.0
+    hooks:
+      - id: codespell
+        additional_dependencies:
+          - tomli
+        files: ".*"
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: "0.5.24"
+    hooks:
+      - id: uv-lock
+        entry: bash -c "uv lock --frozen"

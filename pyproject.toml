@@ -24,6 +24,7 @@ line-length = 200
 lint.exclude = [
     "**/input_repo/**",
     "**/output_repo/**",
+    "**/repositories/**",
 ]
 
 [tool.uv]

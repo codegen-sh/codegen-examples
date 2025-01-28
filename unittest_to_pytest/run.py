@@ -1,10 +1,10 @@
+import codegen
 from codegen import Codebase
 
 # Initialize codebase
-codebase = Codebase("./")
 
 # Define the target directory
-TARGET_DIR = "repo-before/tests"
+TARGET_DIR = "input_repo/tests"
 
 
 def remove_unittest_inheritance(file):
@@ -53,7 +53,8 @@ def {fixture_name}():
             print(f"🗑️ Removed setUp method from class {cls.name}")
 
 
-def main():
+@codegen.function("unittest-to-pytest")
+def run(codebase: Codebase):
     """Main function to run the unittest to pytest conversion"""
     print("🚀 Starting unittest to pytest conversion...")
 
@@ -76,4 +77,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    codebase = Codebase("./")
+    run(codebase)

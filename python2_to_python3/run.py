@@ -1,10 +1,10 @@
+import codegen
 from codegen import Codebase
 
 # Initialize codebase
-codebase = Codebase("./")
 
 # Define the target directory
-TARGET_DIR = "repo-before"
+TARGET_DIR = "input_repo"
 
 
 def convert_print_statements(file):
@@ -115,7 +115,8 @@ def update_iterators(file):
                     stmt.edit(new_stmt)
 
 
-def main():
+@codegen.function("python2-to-python3")
+def run():
     """Main function to run the Python 2 to 3 conversion"""
     print("🚀 Starting Python 2 to 3 conversion...\n")
 
@@ -149,4 +150,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    codebase = Codebase("./")
+
+    run(codebase)

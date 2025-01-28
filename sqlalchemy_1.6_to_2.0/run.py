@@ -76,8 +76,6 @@ def update_relationships(file):
     ]:
         process_relationship(item)
 
-    return changes if changes else None
-
 
 def update_query_syntax(file):
     """Update to SQLAlchemy 2.0 query style."""
@@ -99,8 +97,6 @@ def update_query_syntax(file):
 
     for item in [*file.functions, *[m for c in file.classes for m in c.methods]]:
         process_queries(item)
-
-    return changes if changes else None
 
 
 def update_configurations(file):
@@ -132,8 +128,6 @@ def update_configurations(file):
                     attr.set_name("from_attributes")
                     attr.set_value("True")
                     changes.append(f"- {old_attr}\n+ from_attributes = True")
-
-    return changes if changes else None
 
 
 if __name__ == "__main__":

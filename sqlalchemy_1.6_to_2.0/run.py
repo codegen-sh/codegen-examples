@@ -12,42 +12,27 @@ def run(codebase: Codebase):
     3. Query syntax to 2.0 style
     4. Configuration and lazy loading defaults
     """
-    changes_by_file = {}
-
     for file in codebase.files:
         print(f"🔍 Processing {file.filepath}")
 
-        changes = []
         for updater in [
             update_base_class,
             update_relationships,
             update_query_syntax,
             update_configurations,
         ]:
-            if file_changes := updater(file):
-                changes.extend(file_changes)
+            updater(file)
 
-        if changes:
-            changes_by_file[file.filepath] = changes
-
-    # Print summary
+    # Print changes using codebase diff
     print("\n📝 Changes made:")
-    for filepath, changes in changes_by_file.items():
-        print(f"\n{filepath}:")
-        for change in changes:
-            print(f"{change}")
+    print(codebase.get_diff())
 
 
 def update_base_class(file):
     """Update Base class inheritance and imports."""
-    changes = []
-
     # Update imports
     if any("Base" in cls.parent_class_names for cls in file.classes):
         file.add_import_from_import_string("from sqlalchemy.orm import DeclarativeBase")
-        changes.append(
-            "- from sqlalchemy.ext.declarative import declarative_base\n+ from sqlalchemy.orm import DeclarativeBase"
-        )
 
         for imp in file.imports:
             if imp.symbol_name == "declarative_base":
@@ -57,14 +42,8 @@ def update_base_class(file):
     for cls in file.classes:
         if cls.name == "Base":
             cls.set_parent_class("DeclarativeBase")
-            changes.append("- class Base(object):\n+ class Base(DeclarativeBase):")
-        elif "Base" in cls.parent_class_names and not any(
-            c.name == "Base" for c in file.classes
-        ):
+        elif "Base" in cls.parent_class_names and not any(c.name == "Base" for c in file.classes):
             cls.insert_before("\nclass Base(DeclarativeBase):\n    pass\n")
-            changes.append("+ class Base(DeclarativeBase):\n+     pass")
-
-    return changes if changes else None
 
 
 def update_relationships(file):
@@ -87,9 +66,7 @@ def update_relationships(file):
             elif "back_populates" not in arg_names:
                 old_value = f'relationship("{call.args[0].value.source}"'
                 call.set_kwarg("back_populates", "None")
-                new_value = (
-                    f'relationship("{call.args[0].value.source}", back_populates=None'
-                )
+                new_value = f'relationship("{call.args[0].value.source}", back_populates=None'
                 changes.append(f"- {old_value}\n+ {new_value}")
 
     for item in [
@@ -132,24 +109,16 @@ def update_configurations(file):
 
     # Update engine and session config
     for call in file.function_calls:
-        if call.name == "create_engine" and not any(
-            arg.name == "future" for arg in call.args
-        ):
+        if call.name == "create_engine" and not any(arg.name == "future" for arg in call.args):
             old_call = "create_engine(url)"
             call.set_kwarg("future", "True")
             call.set_kwarg("pool_pre_ping", "True")
-            changes.append(
-                f"- {old_call}\n+ create_engine(url, future=True, pool_pre_ping=True)"
-            )
-        elif call.name == "sessionmaker" and not any(
-            arg.name == "future" for arg in call.args
-        ):
+            changes.append(f"- {old_call}\n+ create_engine(url, future=True, pool_pre_ping=True)")
+        elif call.name == "sessionmaker" and not any(arg.name == "future" for arg in call.args):
             old_call = "sessionmaker(bind=engine)"
             call.set_kwarg("future", "True")
             changes.append(f"- {old_call}\n+ sessionmaker(bind=engine, future=True)")
-        elif call.name == "relationship" and not any(
-            arg.name == "lazy" for arg in call.args
-        ):
+        elif call.name == "relationship" and not any(arg.name == "lazy" for arg in call.args):
             old_call = f'relationship("{call.args[0].value.source}"'
             call.set_kwarg("lazy", '"select"')
             changes.append(f'- {old_call}\n+ {old_call}, lazy="select")')

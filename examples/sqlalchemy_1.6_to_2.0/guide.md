@@ -8,20 +8,20 @@ This guide walks you through the steps to migrate your codebase from SQLAlchemy 
 
 The migration focuses on these key updates:
 
-1. **Import Adjustments**  
-   Aligns your code with the updated SQLAlchemy 2.0 module structure.  
+1. **Import Adjustments**
+   Aligns your code with the updated SQLAlchemy 2.0 module structure.
    [Run the Import Codemod](https://www.codegen.sh/search/6506?skillType=codemod)
 
-2. **Relationship Updates**  
-   Refines relationship definitions by replacing `backref` with `back_populates` for explicitness and better readability.  
+2. **Relationship Updates**
+   Refines relationship definitions by replacing `backref` with `back_populates` for explicitness and better readability.
    [Run the Relationship Codemod](https://www.codegen.sh/search/6510?skillType=codemod)
 
-3. **Query Syntax Modernization**  
-   Updates queries to leverage the latest syntax like `select()` and `where()`, removing deprecated methods.  
+3. **Query Syntax Modernization**
+   Updates queries to leverage the latest syntax like `select()` and `where()`, removing deprecated methods.
    [Run the Query Syntax Codemod](https://www.codegen.sh/search/6508?skillType=codemod)
 
 4. **Relationship Lazy Loading**
-   SQLAlchemy 2.0 introduces a new `lazy` parameter for relationship definitions. Update your relationships to use the new `lazy` parameter for improved performance.  
+   SQLAlchemy 2.0 introduces a new `lazy` parameter for relationship definitions. Update your relationships to use the new `lazy` parameter for improved performance.
    [Run the Relationship Lazy Loading Codemod](https://www.codegen.sh/search/6512?skillType=codemod)
 
 5. **Type Annotations**

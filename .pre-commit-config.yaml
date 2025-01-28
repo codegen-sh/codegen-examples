@@ -1,6 +1,16 @@
 default_language_version:
   python: python3.12
 fail_fast: true
+
+ci:
+  # Define the common exclude pattern as an anchor
+  exclude_patterns: &exclude_patterns |
+    (?x)(
+      input_repo/.*|
+      output_repo/.*|
+      repositories/.*
+    )
+
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.9.3
@@ -9,10 +19,12 @@ repos:
       - id: ruff
         types_or: [python, jupyter, pyi]
         args: [--fix]
+        exclude: *exclude_patterns
 
       # Run the formatter.
       - id: ruff-format
         types_or: [python, jupyter, pyi]
+        exclude: *exclude_patterns
 
   - repo: https://github.com/kynan/nbstripout
     rev: 0.8.1
@@ -23,11 +35,12 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: tests/
+        exclude: *exclude_patterns
         exclude_types: [mdx, pyi]
       - id: check-yaml
+        exclude: *exclude_patterns
       - id: end-of-file-fixer
-        files: .*/expected_diff.patch
+        exclude: *exclude_patterns
       - id: check-merge-conflict
 
   - repo: https://github.com/python-jsonschema/check-jsonschema

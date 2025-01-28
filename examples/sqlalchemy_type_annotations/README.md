@@ -44,7 +44,7 @@ The script automates the entire migration process in a few key steps:
 # Before
 id = Column(Integer, primary_key=True)
 name = Column(String)
-   
+
 # After
 id: Mapped[int] = mapped_column(primary_key=True)
 name: Mapped[str] = mapped_column()
@@ -54,7 +54,7 @@ name: Mapped[str] = mapped_column()
 ```python
 # Before
 description = Column(String, nullable=True)
-   
+
 # After
 description: Mapped[Optional[str]] = mapped_column(nullable=True)
 ```
@@ -63,7 +63,7 @@ description: Mapped[Optional[str]] = mapped_column(nullable=True)
 ```python
 # Before
 addresses = relationship("Address", backref="user")
-   
+
 # After
 addresses: Mapped[List["Address"]] = relationship(back_populates="user")
 ```
@@ -106,7 +106,7 @@ class Publisher(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name: Mapped[str] = mapped_column(unique=True, index=True)
     books: Mapped[List["Book"]] = relationship(
-        "Book", 
+        "Book",
         back_populates="publisher"
     )
 
@@ -122,7 +122,7 @@ class Book(Base):
         nullable=True
     )
     publisher: Mapped[Optional["Publisher"]] = relationship(
-        "Publisher", 
+        "Publisher",
         back_populates="books"
     )
 ```

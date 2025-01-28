@@ -13,7 +13,7 @@ The migration script handles four key transformations:
    # From:
    from flask import Flask
    app = Flask(__name__)
-   
+
    # To:
    from fastapi import FastAPI
    app = FastAPI()
@@ -23,7 +23,7 @@ The migration script handles four key transformations:
    ```python
    # From:
    @app.route("/users", methods=["POST"])
-   
+
    # To:
    @app.post("/users")
    ```
@@ -39,7 +39,7 @@ The migration script handles four key transformations:
    ```python
    # From:
    return render_template("users.html", users=users)
-   
+
    # To:
    return Jinja2Templates(directory="templates").TemplateResponse(
        "users.html",
@@ -71,4 +71,4 @@ The script will process all Python files in the `repo-before` directory and appl
 - [Full Tutorial](https://docs.codegen.com/tutorials/flask-to-fastapi)
 - [Flask Documentation](https://flask.palletsprojects.com/)
 - [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [Codegen Documentation](https://docs.codegen.com) 
+- [Codegen Documentation](https://docs.codegen.com)

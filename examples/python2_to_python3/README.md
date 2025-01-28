@@ -13,7 +13,7 @@ The migration script handles five key transformations:
    # From:
    print "Hello, world!"
    print x, y, z
-   
+
    # To:
    print("Hello, world!")
    print(x, y, z)
@@ -25,7 +25,7 @@ The migration script handles five key transformations:
    from __future__ import unicode_literals
    text = unicode("Hello")
    prefix = u"prefix"
-   
+
    # To:
    text = str("Hello")
    prefix = "prefix"
@@ -35,7 +35,7 @@ The migration script handles five key transformations:
    ```python
    # From:
    name = raw_input("Enter your name: ")
-   
+
    # To:
    name = input("Enter your name: ")
    ```
@@ -47,7 +47,7 @@ The migration script handles five key transformations:
        process_data()
    except ValueError, e:
        print(e)
-   
+
    # To:
    try:
        process_data()
@@ -61,7 +61,7 @@ The migration script handles five key transformations:
    class MyIterator:
        def next(self):
            return self.value
-   
+
    # To:
    class MyIterator:
        def __next__(self):
@@ -91,4 +91,4 @@ The script will process all Python files in the `repo-before` directory and appl
 - [Full Tutorial](https://docs.codegen.com/tutorials/python2-to-python3)
 - [Python 3 Documentation](https://docs.python.org/3/)
 - [What's New in Python 3](https://docs.python.org/3/whatsnew/3.0.html)
-- [Codegen Documentation](https://docs.codegen.com) 
+- [Codegen Documentation](https://docs.codegen.com)

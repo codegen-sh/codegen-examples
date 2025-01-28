@@ -21,7 +21,7 @@ classifiers = [
 
 [tool.ruff]
 line-length = 200
-lint.exclude = [
+exclude = [
     "**/input_repo/**",
     "**/output_repo/**",
     "**/repositories/**",

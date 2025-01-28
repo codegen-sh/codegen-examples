@@ -1,8 +1,7 @@
 # main.py
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-import models
-import schemas
+import models, schemas
 from database import SessionLocal, engine
 from typing import List
 
@@ -106,4 +105,3 @@ def delete_publisher(publisher_id: int, db: Session = Depends(get_db)):
     db.delete(db_publisher)
     db.commit()
     return db_publisher
-

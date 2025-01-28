@@ -1,64 +1,61 @@
 # SQLAlchemy 1.6 to 2.0 Migration Example
 
-[![Documentation](https://img.shields.io/badge/docs-docs.codegen.com-blue)](https://docs.codegen.com/tutorials/sqlalchemy-1.6-to-2.0)
+This codemod demonstrates how to use Codegen to automatically migrate SQLAlchemy 1.6 code to the new 2.0-style query interface. For a complete walkthrough, check out our [tutorial](https://docs.codegen.com/tutorials/sqlalchemy-1.6-to-2.0).
 
-This example demonstrates how to use Codegen to automatically migrate SQLAlchemy 1.6 code to the new 2.0-style query interface. For a complete walkthrough, check out our [tutorial](https://docs.codegen.com/tutorials/sqlalchemy-1.6-to-2.0).
+## How the Migration Script Works
 
-## What This Example Does
+The codemod script handles four key transformations:
 
-The migration script handles four key transformations:
-
-1. **Convert Query to Select**
+1. **Update Base Class and Imports**
    ```python
    # From:
-   session.query(User).filter_by(name='john').all()
-
+   from sqlalchemy.ext.declarative import declarative_base
+   Base = declarative_base()
+   
    # To:
-   session.execute(
-       select(User).where(User.name == 'john')
-   ).scalars().all()
+   from sqlalchemy.orm import DeclarativeBase
+   class Base(DeclarativeBase):
+       pass
    ```
+   Updates the Base class to use the new DeclarativeBase style.
 
-2. **Update Session Execution**
-   ```python
-   # From:
-   users = session.query(User).all()
-   first_user = session.query(User).first()
-
-   # To:
-   users = session.execute(select(User)).scalars().all()
-   first_user = session.execute(select(User)).scalars().first()
-   ```
-
-3. **Modernize ORM Relationships**
+2. **Modernize ORM Relationships**
    ```python
    # From:
    class User(Base):
        addresses = relationship("Address", backref="user")
-
+   
    # To:
    class User(Base):
-       addresses = relationship("Address", back_populates="user", use_list=True)
-   class Address(Base):
-       user = relationship("User", back_populates="addresses")
+       addresses = relationship("Address", back_populates="user")
    ```
+   Relationships are modernized to use explicit back_populates instead of backref. If no back reference is specified, it defaults to None.
 
-4. **Add Type Annotations**
+3. **Update Query Method Names**
    ```python
    # From:
-   class User(Base):
-       __tablename__ = "users"
-       id = Column(Integer, primary_key=True)
-       name = Column(String)
-       addresses = relationship("Address")
-
+   db.session.query(User).filter(User.name == 'john').all()
+   db.session.query(User).first()
+   
    # To:
-   class User(Base):
-       __tablename__ = "users"
-       id: Mapped[int] = mapped_column(primary_key=True)
-       name: Mapped[str] = mapped_column()
-       addresses: Mapped[List["Address"]] = relationship()
+   db.session.select(User).where(User.name == 'john').scalars().all()
+   db.session.select(User).scalar_one_or_none()
    ```
+   Updates query method names to their 2.0 equivalents: `query` → `select`, `filter` → `where`, `all` → `scalars().all`, and `first` → `scalar_one_or_none`.
+
+4. **Update Configurations**
+   ```python
+   # From:
+   create_engine(url)
+   sessionmaker(bind=engine)
+   relationship("Address")
+   
+   # To:
+   create_engine(url, future=True, pool_pre_ping=True)
+   sessionmaker(bind=engine, future=True)
+   relationship("Address", lazy="select")
+   ```
+   Adds future-compatible configurations and default lazy loading settings. Also updates Pydantic configs from `orm_mode` to `from_attributes`.
 
 ## Running the Example
 
@@ -70,17 +67,11 @@ pip install codegen
 python run.py
 ```
 
-The script will process all Python files in the `repo-before` directory and apply the transformations in the correct order.
-
-## Understanding the Code
-
-- `run.py` - The migration script
-- `repo-before/` - Sample SQLAlchemy 1.6 application to migrate
-- `guide.md` - Additional notes and explanations
+The script will process all Python files in the `input_repo` directory and apply the transformations in the correct order.
 
 ## Learn More
 
 - [Full Tutorial](https://docs.codegen.com/tutorials/sqlalchemy-1.6-to-2.0)
 - [SQLAlchemy Documentation](https://docs.sqlalchemy.org/en/20/)
 - [What's New in SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/changelog/migration_20.html)
-- [Codegen Documentation](https://docs.codegen.com)
+- [Codegen Documentation](https://docs.codegen.com) 

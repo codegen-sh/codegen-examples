@@ -1,20 +1,31 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
-from database import Base
+from pydantic import BaseModel
+from typing import List, Optional
 
-class Publisher(Base):
-    __tablename__ = "publishers"
+class PublisherBase(BaseModel):
+    name: str
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
-    books = relationship("Book", backref="publisher")
+class PublisherCreate(PublisherBase):
+    pass
 
+class Publisher(PublisherBase):
+    id: int
+    books: List["Book"] = []
 
-class Book(Base):
-    __tablename__ = "books"
+    class Config:
+        orm_mode = True
 
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    author = Column(String, index=True)
-    description = Column(String)
-    publisher_id = Column(Integer, ForeignKey("publishers.id"))
+class BookBase(BaseModel):
+    title: str
+    author: str
+    description: str
+    publisher_id: Optional[int]
+
+class BookCreate(BookBase):
+    pass
+
+class Book(BookBase):
+    id: int
+    publisher: Optional[Publisher]
+
+    class Config:
+        orm_mode = True

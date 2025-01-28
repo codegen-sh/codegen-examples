@@ -6,9 +6,9 @@ ci:
   # Define the common exclude pattern as an anchor
   exclude_patterns: &exclude_patterns |
     (?x)(
-      input_repo/.*|
-      output_repo/.*|
-      repositories/.*
+      .*/input_repo/.*|
+      .*/output_repo/.*|
+      .*/repositories/.*
     )
 
 repos:

@@ -6,31 +6,20 @@ This codemod demonstrates how to use Codegen to automatically migrate SQLAlchemy
 
 The codemod script handles four key transformations:
 
-1. **Convert Query to Select**
+1. **Update Base Class and Imports**
    ```python
    # From:
-   session.query(User).filter_by(name='john').all()
+   from sqlalchemy.ext.declarative import declarative_base
+   Base = declarative_base()
    
    # To:
-   session.execute(
-       select(User).where(User.name == 'john')
-   ).scalars().all()
+   from sqlalchemy.orm import DeclarativeBase
+   class Base(DeclarativeBase):
+       pass
    ```
-   This transformation replaces the legacy Query interface with the new Select-based API, providing better type safety and consistency.
+   Updates the Base class to use the new DeclarativeBase style.
 
-2. **Update Session Execution**
-   ```python
-   # From:
-   users = session.query(User).all()
-   first_user = session.query(User).first()
-   
-   # To:
-   users = session.execute(select(User)).scalars().all()
-   first_user = session.execute(select(User)).scalars().first()
-   ```
-   Session execution is updated to use the new execute() method, which provides clearer separation between SQL construction and execution.
-
-3. **Modernize ORM Relationships**
+2. **Modernize ORM Relationships**
    ```python
    # From:
    class User(Base):
@@ -38,29 +27,35 @@ The codemod script handles four key transformations:
    
    # To:
    class User(Base):
-       addresses = relationship("Address", back_populates="user", use_list=True)
-   class Address(Base):
-       user = relationship("User", back_populates="addresses")
+       addresses = relationship("Address", back_populates="user")
    ```
-   Relationships are modernized to use explicit back_populates instead of backref, making bidirectional relationships more maintainable and explicit.
+   Relationships are modernized to use explicit back_populates instead of backref. If no back reference is specified, it defaults to None.
 
-4. **Add Type Annotations**
+3. **Update Query Method Names**
    ```python
    # From:
-   class User(Base):
-       __tablename__ = "users"
-       id = Column(Integer, primary_key=True)
-       name = Column(String)
-       addresses = relationship("Address")
+   db.session.query(User).filter(User.name == 'john').all()
+   db.session.query(User).first()
    
    # To:
-   class User(Base):
-       __tablename__ = "users"
-       id: Mapped[int] = mapped_column(primary_key=True)
-       name: Mapped[str] = mapped_column()
-       addresses: Mapped[List["Address"]] = relationship()
+   db.session.select(User).where(User.name == 'john').scalars().all()
+   db.session.select(User).scalar_one_or_none()
    ```
-   Type annotations are added using SQLAlchemy 2.0's Mapped[] syntax, enabling better IDE support and runtime type checking.
+   Updates query method names to their 2.0 equivalents: `query` → `select`, `filter` → `where`, `all` → `scalars().all`, and `first` → `scalar_one_or_none`.
+
+4. **Update Configurations**
+   ```python
+   # From:
+   create_engine(url)
+   sessionmaker(bind=engine)
+   relationship("Address")
+   
+   # To:
+   create_engine(url, future=True, pool_pre_ping=True)
+   sessionmaker(bind=engine, future=True)
+   relationship("Address", lazy="select")
+   ```
+   Adds future-compatible configurations and default lazy loading settings. Also updates Pydantic configs from `orm_mode` to `from_attributes`.
 
 ## Running the Example
 

@@ -90,4 +90,4 @@ The generated `training_data.json` follows this structure:
 
 - [Full Tutorial](https://docs.codegen.com/tutorials/generate-training-data)
 - [Code Model Pre-training](https://docs.codegen.com/concepts/code-model-training)
-- [Codegen Documentation](https://docs.codegen.com) 
+- [Codegen Documentation](https://docs.codegen.com)

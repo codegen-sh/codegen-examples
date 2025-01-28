@@ -54,9 +54,7 @@ def run(codebase: Codebase):
             # Convert to useSuspenseQueries if needed
             if old_statements:
                 new_query = f"const [{', '.join(results)}] = useSuspenseQueries({{queries: [{', '.join(queries)}]}})"
-                print(
-                    f"Converting useSuspenseQuery to useSuspenseQueries in {function.name}"
-                )
+                print(f"Converting useSuspenseQuery to useSuspenseQueries in {function.name}")
 
                 # Print the diff
                 print("\nOriginal code:")

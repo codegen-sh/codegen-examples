@@ -12,17 +12,17 @@ The script automates the entire migration process in a few key steps:
    class TestUsers(unittest.TestCase):
        def setUp(self):
            self.db = setup_test_db()
-           
+
        def test_create_user(self):
            user = self.db.create_user("test")
            self.assertEqual(user.name, "test")
-   
+
    # To:
    @pytest.fixture
    def db():
        db = setup_test_db()
        yield db
-   
+
    def test_create_user(db):
        user = db.create_user("test")
        assert user.name == "test"
@@ -37,7 +37,7 @@ The script automates the entire migration process in a few key steps:
        self.assertTrue(is_valid("test"))
        self.assertEqual(count_items(), 0)
        self.assertRaises(ValueError, parse_id, "invalid")
-   
+
    # To:
    def test_validation():
        assert is_valid("test")
@@ -53,7 +53,7 @@ The script automates the entire migration process in a few key steps:
    # From:
    if __name__ == '__main__':
        unittest.main()
-   
+
    # To:
    # Remove unittest.main() and rename files to test_*.py
    ```
@@ -66,7 +66,7 @@ The script automates the entire migration process in a few key steps:
    @classmethod
    def setUpClass(cls):
        cls.conn = create_db()
-   
+
    # To:
    @pytest.fixture(scope="session")
    def conn():
@@ -101,4 +101,4 @@ The script will process all Python test files in the `repo-before` directory and
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests! 
+Feel free to submit issues and enhancement requests!

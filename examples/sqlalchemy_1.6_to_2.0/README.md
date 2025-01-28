@@ -12,7 +12,7 @@ The migration script handles four key transformations:
    ```python
    # From:
    session.query(User).filter_by(name='john').all()
-   
+
    # To:
    session.execute(
        select(User).where(User.name == 'john')
@@ -24,7 +24,7 @@ The migration script handles four key transformations:
    # From:
    users = session.query(User).all()
    first_user = session.query(User).first()
-   
+
    # To:
    users = session.execute(select(User)).scalars().all()
    first_user = session.execute(select(User)).scalars().first()
@@ -35,7 +35,7 @@ The migration script handles four key transformations:
    # From:
    class User(Base):
        addresses = relationship("Address", backref="user")
-   
+
    # To:
    class User(Base):
        addresses = relationship("Address", back_populates="user", use_list=True)
@@ -51,7 +51,7 @@ The migration script handles four key transformations:
        id = Column(Integer, primary_key=True)
        name = Column(String)
        addresses = relationship("Address")
-   
+
    # To:
    class User(Base):
        __tablename__ = "users"
@@ -83,4 +83,4 @@ The script will process all Python files in the `repo-before` directory and appl
 - [Full Tutorial](https://docs.codegen.com/tutorials/sqlalchemy-1.6-to-2.0)
 - [SQLAlchemy Documentation](https://docs.sqlalchemy.org/en/20/)
 - [What's New in SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/changelog/migration_20.html)
-- [Codegen Documentation](https://docs.codegen.com) 
+- [Codegen Documentation](https://docs.codegen.com)

@@ -8,12 +8,7 @@ This is a collection of examples using [Codegen](https://codegen.com). You can u
 
 We recommend using [`uv`](https://github.com/astral-sh/uv) with Python 3.13 for the best experience.
 
-The complete installation guide for Codegen is available [here](https://docs.codegen.com/introduction/installation). The steps below are a quickstart to getting the examples working.
-
-First, install uv if you haven't already
-```bash
-brew install uv
-```
+To install Codegen, please follow the [official installation guide](https://docs.codegen.com/introduction/installation). Once Codegen is installed, use these steps to run the examples in this repository:
 
 Install the Codegen CLI globally
 ```bash
@@ -25,20 +20,20 @@ Initialize Codegen in your project
 codegen init
 ```
 
-Activate a virtual environment
+Activate the virtual environment
 ```bash
 source .codegen/.venv/bin/activate
 ```
 
 Your environment is now ready to run example codemods.
 
-### IDE Configuration
+### IDE Configuration (Optional)
 
 To configure your IDE for optimal use with Codegen, follow our [IDE setup guide](https://docs.codegen.com/introduction/ide-usage#configuring-your-ide-interpreter).
 
 ## Examples
 
-Within the /examples folder, each subdirectory contains a self-contained example with:
+Within the examples folder, each subdirectory contains a self-contained example with:
 - An explanation of the transformation (`README.md`)
 - A Codegen script that performs the transformation (`run.py`)
 - Sample code to transform if not using a repository (`input_repo/`)

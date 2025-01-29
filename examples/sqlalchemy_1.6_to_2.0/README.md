@@ -60,23 +60,10 @@ The migration script handles four key transformations:
        addresses: Mapped[List["Address"]] = relationship()
    ```
 
-## Running the Example
-
-```bash
-# Install Codegen
-pip install codegen
-
-# Run the migration
-python run.py
-```
-
-The script will process all Python files in the `repo-before` directory and apply the transformations in the correct order.
-
 ## Understanding the Code
 
-- `run.py` - The migration script
-- `repo-before/` - Sample SQLAlchemy 1.6 application to migrate
-- `guide.md` - Additional notes and explanations
+- `input_repo` - Sample SQLAlchemy 1.6 application to migrate
+- `output_repo` - Sample SQLAlchemy 2.0 application after migration
 
 ## Learn More
 

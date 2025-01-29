@@ -16,7 +16,7 @@ example-name/
 ├── README.md        # Documentation and usage examples
 ├── run.py          # Main implementation
 ├── guide.md        # (Optional) Additional technical details
-└── repo-before/    # (Optional) Sample code for transformation
+└── input_repo/    # (Optional) Sample code for transformation
 ```
 
 ## Code Organization in `run.py`
@@ -43,7 +43,7 @@ Your `run.py` should follow this structure, demonstrated well in the `generate_t
    @codegen.function("your-function-name")
    def run(codebase: Codebase):
        """Clear docstring explaining what the function does.
-       
+
        Include:
        1. Purpose of the function
        2. Key steps or transformations
@@ -128,7 +128,7 @@ def get_function_context(function) -> dict:
 @codegen.function("generate-training-data")
 def run(codebase: Codebase):
     """Generate training data using a node2vec-like approach...
-    
+
     This codemod:
     1. Finds all functions...
     2. For each function...

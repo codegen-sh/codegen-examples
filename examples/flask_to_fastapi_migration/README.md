@@ -63,8 +63,7 @@ The script will process all Python files in the `repo-before` directory and appl
 ## Understanding the Code
 
 - `run.py` - The migration script
-- `repo-before/` - Sample Flask application to migrate
-- `guide.md` - Additional notes and explanations
+- `input_repo/` - Sample Flask application to migrate
 
 ## Learn More
 

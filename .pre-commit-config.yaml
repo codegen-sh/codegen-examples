@@ -62,6 +62,8 @@ repos:
         additional_dependencies:
           - tomli
         files: ".*"
+        exclude: ".*\\.ipynb"
+
 
   - repo: https://github.com/astral-sh/uv-pre-commit
     rev: "0.5.24"

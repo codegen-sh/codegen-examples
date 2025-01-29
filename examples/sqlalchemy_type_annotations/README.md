@@ -132,6 +132,7 @@ class Book(Base):
 ```bash
 # Install Codegen
 pip install codegen
+
 # Run the migration
 python run.py
 ```

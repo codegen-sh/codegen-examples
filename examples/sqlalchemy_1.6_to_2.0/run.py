@@ -36,9 +36,14 @@ def run(codebase: Codebase):
                     new_query = f".where({' & '.join(new_conditions)})"
                 if "execute" not in chain.parent.source:
                     new_query = f"execute({new_query}).scalars()"
-                print("\nConverting query:")
-                print("Original:", original_code)
-                print("New:", new_query)
+
+                print(f"\nConverting query in {file.path}:\n")
+                print("Original code:")
+                print(original_code)
+                print("\nNew code:")
+                print(new_query)
+                print("-" * 50)
+
                 chain.edit(new_query)
                 file_modified = True
                 functions_modified += 1
@@ -52,9 +57,14 @@ def run(codebase: Codebase):
                         new_rel = original_rel + ', lazy="selectin"'
                         if "backref" in new_rel:
                             new_rel = new_rel.replace("backref", "back_populates")
-                        print("\nUpdating relationship:")
-                        print("Original:", original_rel)
-                        print("New:", new_rel)
+
+                        print(f"\nUpdating relationship in class {cls.name}:\n")
+                        print("Original code:")
+                        print(original_rel)
+                        print("\nNew code:")
+                        print(new_rel)
+                        print("-" * 50)
+
                         attr.value.edit(new_rel)
                         file_modified = True
                         functions_modified += 1
@@ -67,9 +77,14 @@ def run(codebase: Codebase):
                     new_attr = original_attr.replace("Column", "mapped_column")
                     type_hint = "Mapped" + original_attr.split("= Column")[1]
                     new_attr = f"{attr.name}: {type_hint}"
-                    print("\nUpdating column definition:")
-                    print("Original:", original_attr)
-                    print("New:", new_attr)
+
+                    print(f"\nUpdating column definition in class {cls.name}:\n")
+                    print("Original code:")
+                    print(original_attr)
+                    print("\nNew code:")
+                    print(new_attr)
+                    print("-" * 50)
+
                     attr.edit(new_attr)
                     file_modified = True
                     functions_modified += 1
@@ -83,7 +98,8 @@ def run(codebase: Codebase):
 
 
 if __name__ == "__main__":
+    repo_path = "./input_repo"
     print("Initializing codebase...")
-    codebase = Codebase("./input_repo")
+    codebase = Codebase(repo_path)
     print("Running SQLAlchemy 1.6 to 2.0 codemod...")
     run(codebase)

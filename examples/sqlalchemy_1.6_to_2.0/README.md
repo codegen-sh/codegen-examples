@@ -4,7 +4,7 @@
 
 This example demonstrates how to use Codegen to automatically migrate SQLAlchemy 1.6 code to the new 2.0-style query interface. For a complete walkthrough, check out our [tutorial](https://docs.codegen.com/tutorials/sqlalchemy-1.6-to-2.0).
 
-## What This Example Does
+## How the Migration Script Works
 
 The migration script handles four key transformations:
 
@@ -18,6 +18,9 @@ The migration script handles four key transformations:
        select(User).where(User.name == 'john')
    ).scalars().all()
    ```
+    - Replaces legacy `query()` syntax with modern `select()` statements
+    - Updates filter conditions to use explicit comparison operators
+    - Adds proper `execute()` and `scalars()` chain
 
 2. **Update Session Execution**
    ```python
@@ -29,6 +32,9 @@ The migration script handles four key transformations:
    users = session.execute(select(User)).scalars().all()
    first_user = session.execute(select(User)).scalars().first()
    ```
+    - Modernizes session query methods with `execute()` pattern
+    - Adds proper result handling with `scalars()`
+    - Updates common operations like `all()`, `first()`, `one()`
 
 3. **Modernize ORM Relationships**
    ```python
@@ -42,6 +48,9 @@ The migration script handles four key transformations:
    class Address(Base):
        user = relationship("User", back_populates="addresses")
    ```
+   - Replaces deprecated `backref` with explicit `back_populates`
+   - Creates bidirectional relationship definitions
+   - Adds `use_list` parameter for collection relationships
 
 4. **Add Type Annotations**
    ```python
@@ -59,11 +68,19 @@ The migration script handles four key transformations:
        name: Mapped[str] = mapped_column()
        addresses: Mapped[List["Address"]] = relationship()
    ```
+    - Introduces `Mapped[]` type wrappers for all columns
+    - Converts `Column()` to `mapped_column()`
+    - Handles nullable fields with `Optional[]` types
 
-## Understanding the Code
+## Running the Migration
 
-- `input_repo` - Sample SQLAlchemy 1.6 application to migrate
-- `output_repo` - Sample SQLAlchemy 2.0 application after migration
+```bash
+# Install Codegen
+pip install codegen
+
+# Run the migration
+python run.py
+```
 
 ## Learn More
 
@@ -71,3 +88,7 @@ The migration script handles four key transformations:
 - [SQLAlchemy Documentation](https://docs.sqlalchemy.org/en/20/)
 - [What's New in SQLAlchemy 2.0](https://docs.sqlalchemy.org/en/20/changelog/migration_20.html)
 - [Codegen Documentation](https://docs.codegen.com)
+
+## Contributing
+
+Feel free to submit issues and enhancement requests!

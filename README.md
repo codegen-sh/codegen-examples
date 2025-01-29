@@ -38,7 +38,7 @@ Within the examples folder, each subdirectory contains a self-contained example 
 - A Codegen script that performs the transformation (`run.py`)
 - Sample code to transform if not using a repository (`input_repo/`)
 
-To see the transformation, simply run the `run.py` script within the desired directory. 
+To see a transformation, simply run the `run.py` script within the desired directory. 
 
 ## Learn More
 

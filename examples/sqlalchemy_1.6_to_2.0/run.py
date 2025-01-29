@@ -54,7 +54,7 @@ def run(codebase: Codebase):
                 if isinstance(attr.value, FunctionCall) and attr.value.name == "relationship":
                     if "lazy=" not in attr.value.source:
                         original_rel = attr.value.source
-                        new_rel = original_rel + ', lazy="selectin"'
+                        new_rel = original_rel + ', lazy="select"'
                         if "backref" in new_rel:
                             new_rel = new_rel.replace("backref", "back_populates")
 

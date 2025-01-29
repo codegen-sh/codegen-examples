@@ -36,7 +36,7 @@ To configure your IDE for optimal use with Codegen, follow our [IDE setup guide]
 Within the examples folder, each subdirectory contains a self-contained example with:
 - An explanation of the transformation (`README.md`)
 - A Codegen script that performs the transformation (`run.py`)
-- Sample code to transform if not using a repository (`input_repo/`)
+- Sample code to transform, if not using a repository (`input_repo/`)
 
 To see a transformation, simply run the `run.py` script within the desired directory. 
 

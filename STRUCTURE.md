@@ -16,7 +16,7 @@ example-name/
 ├── README.md        # Documentation and usage examples
 ├── run.py          # Main implementation
 ├── guide.md        # (Optional) Additional technical details
-└── repo-before/    # (Optional) Sample code for transformation
+└── input_repo/    # (Optional) Sample code for transformation
 ```
 
 ## Code Organization in `run.py`

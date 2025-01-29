@@ -89,8 +89,7 @@ The script will process all Python test files in the `repo-before` directory and
 ## Understanding the Code
 
 - `run.py` - The migration script
-- `repo-before/` - Sample `unittest` test suite to migrate
-- `guide.md` - Additional notes and explanations
+- `input_repo/` - Sample `unittest` test suite to migrate
 
 ## Learn More
 

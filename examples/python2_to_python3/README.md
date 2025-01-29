@@ -83,8 +83,7 @@ The script will process all Python files in the `repo-before` directory and appl
 ## Understanding the Code
 
 - `run.py` - The migration script
-- `repo-before/` - Sample Python 2 code to migrate
-- `guide.md` - Additional notes and explanations
+- `input_repo/` - Sample Python 2 code to migrate
 
 ## Learn More
 

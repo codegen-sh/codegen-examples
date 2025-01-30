@@ -1,4 +1,4 @@
- FreezeGun to TimeMachine Migration Example
+# FreezeGun to TimeMachine Migration Example
 
 This example demonstrates how to use Codegen to automatically migrate test code from FreezeGun to TimeMachine for time mocking. The migration script makes this process simple by handling all the tedious manual updates automatically.
 

@@ -1,5 +1,6 @@
 import codegen
 from codegen import Codebase
+from codegen.sdk.enums import ProgrammingLanguage
 from codegen.sdk.core.detached_symbols.function_call import FunctionCall
 
 
@@ -76,11 +77,11 @@ def run(codebase: Codebase):
     print("\nModification complete:")
     print(f"Files modified: {files_modified}")
     print(f"Functions modified: {functions_modified}")
+    codebase.commit()
 
 
 if __name__ == "__main__":
     print("Initializing codebase...")
-    codebase = Codebase.from_repo("deepfence/ThreatMapper")
-
+    codebase = Codebase.from_repo("deepfence/ThreatMapper", programming_language=ProgrammingLanguage.TYPESCRIPT)
     print("Running codemod...")
     run(codebase)

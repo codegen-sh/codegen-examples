@@ -1,7 +1,7 @@
+import codebase
 from codegen import Codebase
 
 # Initialize codebase
-codebase = Codebase("./")
 
 # Define the target directory
 TARGET_DIR = "repo-before"
@@ -98,7 +98,8 @@ def update_jinja2_syntax(file):
             func_call.set_kwarg("request", "request")
 
 
-def main():
+@codebase.function("flask_to_fastapi_migration")
+def run():
     """Main function to run the Flask to FastAPI migration"""
     print("🚀 Starting Flask to FastAPI migration...\n")
 
@@ -128,4 +129,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    codebase = Codebase("./")
+
+    run()

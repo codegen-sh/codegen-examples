@@ -3,7 +3,7 @@
 This example demonstrates how to automatically convert Python dictionary literals into Pydantic models. The codemod makes this process simple by handling all the tedious manual updates automatically.
 
 > [!NOTE]
-> View example transformations created by this codemod on the `modal-labs/modal-client` repository [here](https://www.codegen.sh/codemod/6b5f2dfa-948a-4953-b283-9bd4b8545632/public/diff). 
+> View example transformations created by this codemod on the `modal-labs/modal-client` repository [here](https://www.codegen.sh/codemod/6b5f2dfa-948a-4953-b283-9bd4b8545632/public/diff).
 
 ## How the Conversion Script Works
 

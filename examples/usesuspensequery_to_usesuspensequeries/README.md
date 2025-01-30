@@ -3,7 +3,7 @@
 This example demonstrates how to use Codegen to automatically convert multiple `useSuspenseQuery` calls to a single `useSuspenseQueries` call in React codebases. The migration script makes this process simple by handling all the tedious manual updates automatically.
 
 > [!NOTE]
-> View example transformations created by this codemod on the `deepfence/ThreatMapper` repository [here](codegen.sh/codemod/a433152e-5e8d-4319-8043-19ff2b418869/public/diff). 
+> View example transformations created by this codemod on the `deepfence/ThreatMapper` repository [here](codegen.sh/codemod/a433152e-5e8d-4319-8043-19ff2b418869/public/diff).
 
 ## How the Migration Script Works
 

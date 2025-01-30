@@ -76,6 +76,7 @@ def run(codebase: Codebase):
     print("\nModification complete:")
     print(f"Files modified: {files_modified}")
     print(f"Functions modified: {functions_modified}")
+    codebase.commit()
 
 
 if __name__ == "__main__":

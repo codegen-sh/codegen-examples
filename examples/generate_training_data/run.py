@@ -2,6 +2,7 @@ import json
 
 import codegen
 from codegen import Codebase
+from codegen.sdk.enums import ProgrammingLanguage
 from codegen.sdk.core.external_module import ExternalModule
 from codegen.sdk.core.import_resolution import Import
 from codegen.sdk.core.symbol import Symbol
@@ -94,7 +95,7 @@ def run(codebase: Codebase):
 
 if __name__ == "__main__":
     print("Initializing codebase...")
-    codebase = Codebase.from_repo("fastapi/fastapi")
+    codebase = Codebase.from_repo("fastapi/fastapi", commit="887270ff8a54bb58c406b0651678a27589793d2f", programming_language=ProgrammingLanguage.PYTHON)
 
     print("Generating training data...")
     training_data = run(codebase)

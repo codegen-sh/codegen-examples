@@ -1,2 +1,3 @@
-import { validateEmail, generateId } from '../module_a/functions';
-import { calculateAverage, multiply, createUserProfile } from '../module_b/functions';
+export { validateEmail, generateId } from '../module_a/functions';
+export { calculateAverage, multiply, createUserProfile } from '../module_b/functions';
+

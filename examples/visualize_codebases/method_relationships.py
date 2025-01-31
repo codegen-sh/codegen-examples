@@ -6,7 +6,6 @@ from codegen.sdk.core.detached_symbols.function_call import FunctionCall
 from codegen.sdk.core.function import Function
 from codegen.sdk.core.external_module import ExternalModule
 from codegen.sdk.core.class_definition import Class
-from codegen.sdk.core.interfaces.callable import FunctionCallDefinition
 
 G = nx.DiGraph()
 
@@ -101,7 +100,7 @@ def run(codebase: Codebase):
 
 if __name__ == "__main__":
     print("Initializing codebase...")
-    codebase = Codebase.from_repo("codegen-oss/modal-client", programming_language=ProgrammingLanguage.PYTHON)
+    codebase = Codebase.from_repo("codegen-oss/modal-client", commit="00bf226a1526f9d775d2d70fc7711406aaf42958", programming_language=ProgrammingLanguage.PYTHON)
     print(f"Codebase with {len(codebase.files)} files and {len(codebase.functions)} functions.")
     print("Creating graph...")
 

@@ -1,4 +1,4 @@
-import { calculateSum, formatName, capitalize } from '../module_a';
+import { calculateSum, formatName, capitalize } from '../module_a/functions';
 
 export const calculateAverage = (numbers: number[]): number => {
     const sum = numbers.reduce((acc, curr) => calculateSum(acc, curr), 0);

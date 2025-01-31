@@ -1,1 +1,1 @@
-export { barFunction } from '../../../moduleB/bar'; 
+export { barFunction } from '../../../moduleB/reexports'; 

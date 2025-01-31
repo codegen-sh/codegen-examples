@@ -1,2 +1,1 @@
-export { Foo } from '../../../moduleA/foo';
-export { utilFunctionA } from '../../../moduleA/utils'; 
+export { Foo, utilFunctionA } from '../../../moduleA/reexports'; 

@@ -1,0 +1,1 @@
+export { barFunction } from '../../moduleB/bar'; 

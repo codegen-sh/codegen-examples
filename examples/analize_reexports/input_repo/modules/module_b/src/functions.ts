@@ -1,4 +1,4 @@
-import { calculateSum, formatName, capitalize, validateEmail } from './src/shared/exports';
+import { calculateSum, formatName, capitalize, validateEmail } from './shared/exports';
 
 export const calculateAverage = (numbers: number[]): number => {
     const sum = numbers.reduce((acc, curr) => calculateSum(acc, curr), 0);

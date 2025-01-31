@@ -1,4 +1,4 @@
-import { validateEmail, generateId, calculateAverage, multiply, createUserProfile } from './src/shared/symbols/exports';
+import { validateEmail, generateId, calculateAverage, multiply, createUserProfile } from './shared/symbols/exports';
 
 export const createUser = (email: string, firstName: string, lastName: string) => {
     if (!validateEmail(email)) {

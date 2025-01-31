@@ -8,7 +8,7 @@ This example demonstrates four different approaches to visualizing code relation
 Traces downstream function call relationships from a target method. This visualization is particularly useful for understanding the flow of execution and identifying complex call chains that might need optimization or refactoring.
 
 > [!NOTE]
-> View the graph-based visualization created by this script on the `PostHog/posthog` repository [here](codegen.sh/codemod/a433152e-5e8d-4319-8043-19ff2b418869/public/diff).
+> View the graph-based visualization created by this script on the `PostHog/posthog` repository [here](https://www.codegen.sh/codemod/6a34b45d-c8ad-422e-95a8-46d4dc3ce2b0/public/diff).
 
 ```python
 def create_downstream_call_trace(src_func: Function, depth: int = 0):
@@ -40,7 +40,7 @@ def create_downstream_call_trace(src_func: Function, depth: int = 0):
 Maps symbol dependencies throughout the codebase. This helps developers identify tightly coupled components and understand the impact of modifying shared dependencies, making it easier to plan architectural changes.
 
 > [!NOTE]
-> View the graph-based visualization created by this script on the `PostHog/posthog` repository [here](codegen.sh/codemod/a433152e-5e8d-4319-8043-19ff2b418869/public/diff).
+> View the graph-based visualization created by this script on the `PostHog/posthog` repository [here](codegen.sh/codemod/f6c63e40-cc20-4b91-a6c7-e5cbd736ce0d/public/diff).
 
 ```python
 def create_dependencies_visualization(symbol: Symbol, depth: int = 0):
@@ -67,7 +67,7 @@ def create_dependencies_visualization(symbol: Symbol, depth: int = 0):
 Shows the impact radius of potential changes. This visualization is invaluable for risk assessment before refactoring, as it reveals all the code paths that could be affected by modifying a particular function or symbol.
 
 > [!NOTE]
-> View the graph-based visualization created by this script on the `PostHog/posthog` repository [here](codegen.sh/codemod/a433152e-5e8d-4319-8043-19ff2b418869/public/diff).
+> View the graph-based visualization created by this script on the `PostHog/posthog` repository [here](codegen.sh/codemod/02f11ebe-6a3a-4687-b31d-2d6bc6a04f3c/public/diff).
 
 ```python
 def create_blast_radius_visualization(symbol: PySymbol, depth: int = 0):

@@ -1,4 +1,4 @@
-import { calculateSum, formatName, capitalize } from '../module_a/functions';
+import { calculateSum, formatName, capitalize, validateEmail } from './src/shared/exports';
 
 export const calculateAverage = (numbers: number[]): number => {
     const sum = numbers.reduce((acc, curr) => calculateSum(acc, curr), 0);
@@ -19,5 +19,6 @@ export const multiply = (a: number, b: number): number => {
 };
 
 export const generateGreeting = (name: string): string => {
+    const email = validateEmail(name);
     return `Hello, ${capitalize(name)}!`;
 };

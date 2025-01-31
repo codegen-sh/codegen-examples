@@ -1,107 +1,110 @@
-# Transform useSuspenseQuery to useSuspenseQueries
+# Function Relationship Visualizations
 
-This example demonstrates how to use Codegen to automatically convert multiple `useSuspenseQuery` calls to a single `useSuspenseQueries` call in React codebases. The migration script makes this process simple by handling all the tedious manual updates automatically.
+This example demonstrates four different approaches to visualizing code relationships using Codegen. Each visualization script creates a graph to help developers understand different aspects of code structure and dependencies.
 
-> [!NOTE]
-> View example transformations created by this codemod on the `deepfence/ThreatMapper` repository [here](codegen.sh/codemod/a433152e-5e8d-4319-8043-19ff2b418869/public/diff).
+## Visualization Types
 
-## How the Migration Script Works
-
-The script automates the entire migration process in a few key steps:
-
-1. **File Detection**
-   ```python
-   for file in codebase.files:
-       if "useSuspenseQuery" not in file.source:
-           continue
-   ```
-   - Automatically identifies files using `useSuspenseQuery`
-   - Skips irrelevant files to avoid unnecessary processing
-   - Uses Codegen's intelligent code analysis engine
-
-2. **Import Management**
-   ```python
-   import_str = "import { useQuery, useSuspenseQueries } from '@tanstack/react-query'"
-   file.add_import_from_import_string(import_str)
-   ```
-   - Uses Codegen's import analysis to add required imports
-   - Preserves existing import structure
-   - Handles import deduplication automatically
-
-3. **Query Transformation**
-   ```python
-   # Convert multiple queries to single useSuspenseQueries call
-   new_query = f"const [{', '.join(results)}] = useSuspenseQueries({{queries: [{', '.join(queries)}]}})"
-   ```
-   - Collects multiple `useSuspenseQuery` calls
-   - Combines them into a single `useSuspenseQueries` call
-   - Maintains variable naming and query configurations
-
-## Why This Makes Migration Easy
-
-1. **Zero Manual Updates**
-   - Codegen SDK handles all the file searching and updating
-   - No tedious copy-paste work
-
-2. **Consistent Changes**
-   - Ensures all transformations follow the same patterns
-   - Maintains code style consistency
-
-3. **Safe Transformations**
-   - Validates changes before applying them
-   - Easy to review and revert if needed
-
-## Common Migration Patterns
-
-### Multiple Query Calls
-```typescript
-// Before
-const result1 = useSuspenseQuery(queryConfig1)
-const result2 = useSuspenseQuery(queryConfig2)
-const result3 = useSuspenseQuery(queryConfig3)
-
-// Automatically converted to:
-const [result1, result2, result3] = useSuspenseQueries({
-  queries: [queryConfig1, queryConfig2, queryConfig3]
-})
+### 1. Function Call Relationships (run_1.py)
+Traces downstream function call relationships from a target method:
+```python
+# Example starting from a specific method
+target_class = codebase.get_class("SharingConfigurationViewSet")
+target_method = target_class.get_method("patch")
 ```
+- Shows all functions called by the target method
+- Tracks nested function calls up to a configurable depth
+- Distinguishes between regular functions, methods, and external calls
+- Color codes different types of functions for better visualization
 
-## Key Benefits to Note
+### 2. Symbol Dependencies (run_2.py)
+Maps symbol dependencies throughout the codebase:
+```python
+# Example starting from a specific function
+target_func = codebase.get_function("get_query_runner")
+```
+- Visualizes both direct symbol references and imports
+- Tracks relationships between functions, classes, and external modules
+- Prevents circular dependencies through cycle detection
+- Uses distinct colors to differentiate symbol types
 
-1. **Reduced Re-renders**
-   - Single query call instead of multiple separate calls
-   - Better React performance
+### 3. Function Blast Radius (run_3.py)
+Shows the impact radius of potential changes:
+```python
+# Example analyzing impact of changes to a function
+target_func = codebase.get_function("export_asset")
+```
+- Identifies all usages of a target function
+- Highlights HTTP method handlers specially
+- Shows how changes might propagate through the codebase
+- Limited to a configurable maximum depth
 
-2. **Improved Code Readability**
-   - Cleaner, more consolidated query logic
-   - Easier to maintain and understand
+### 4. Class Method Relationships (run_4.py)
+Creates a comprehensive view of class method interactions:
+```python
+# Example analyzing an entire class
+target_class = codebase.get_class("_Client")
+```
+- Shows all methods within a class
+- Maps relationships between class methods
+- Tracks external function calls
+- Creates a hierarchical visualization of method dependencies
 
-3. **Network Optimization**
-   - Batched query requests
-   - Better resource utilization
+## Common Features
 
-## Running the Migration
+All visualizations share these characteristics:
+
+1. **Configurable Depth**
+   - MAX_DEPTH setting controls recursion
+   - Prevents infinite loops in circular references
+
+2. **Color Coding**
+   ```python
+   COLOR_PALETTE = {
+       "StartFunction": "#9cdcfe",  # Entry point
+       "PyFunction": "#a277ff",     # Regular functions
+       "PyClass": "#ffca85",        # Classes
+       "ExternalModule": "#f694ff"  # External calls
+   }
+   ```
+
+3. **Edge Metadata**
+   - Tracks file paths
+   - Records source locations
+   - Maintains call relationships
+
+## Running the Visualizations
 
 ```bash
-# Install Codegen
-pip install codegen
+# Install dependencies
+pip install codegen networkx
 
-# Run the migration
-python run.py
+# Run any visualization script
+python run_1.py  # Function call relationships
+python run_2.py  # Symbol dependencies
+python run_3.py  # Function blast radius
+python run_4.py  # Class method relationships
 ```
 
-The script will:
+Each script will:
 1. Initialize the codebase
-2. Find files containing `useSuspenseQuery`
-3. Apply the transformations
-4. Print detailed progress information
+2. Create the appropriate graph
+3. Generate visualization data
+4. Output the graph for viewing in codegen.sh
 
-## Learn More
+## Customization Options
 
-- [React Query Documentation](https://tanstack.com/query/latest)
-- [useSuspenseQueries API](https://tanstack.com/query/latest/docs/react/reference/useSuspenseQueries)
-- [Codegen Documentation](https://docs.codegen.com)
+Each visualization can be customized through global settings:
+
+```python
+IGNORE_EXTERNAL_MODULE_CALLS = True/False  # Filter external calls
+IGNORE_CLASS_CALLS = True/False           # Filter class references
+MAX_DEPTH = 10                           # Control recursion depth
+```
+
+## View Results
+
+After running any script, use codegen.sh to view the interactive visualization of the generated graph.
 
 ## Contributing
 
-Feel free to submit issues and any enhancement requests!
+Feel free to submit issues and enhancement requests to improve these visualizations!

@@ -39,6 +39,7 @@ def run(codebase: Codebase):
             )
 
             # Ensure the "public" file exists
+            print(f" resolved_public_file: {resolved_public_file}")
             if not codebase.has_file(resolved_public_file):
                 print(f"✨ Creating new public file: {resolved_public_file}")
                 target_file = codebase.create_file(resolved_public_file, sync=True)

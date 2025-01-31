@@ -1,9 +1,10 @@
+import codegen
 from codegen import Codebase
 from codegen.sdk.typescript.file import TSFile, TSImport
 from codegen.sdk.enums import ProgrammingLanguage
 
 processed_imports = set()
-
+@codegen.function("reexport_management"
 def run(codebase: Codebase):
     print("🚀 Starting reexport analysis...")
     for file in codebase.files:
@@ -39,7 +40,6 @@ def run(codebase: Codebase):
             )
 
             # Ensure the "public" file exists
-            print(f" resolved_public_file: {resolved_public_file}")
             if not codebase.has_file(resolved_public_file):
                 print(f"✨ Creating new public file: {resolved_public_file}")
                 target_file = codebase.create_file(resolved_public_file, sync=True)

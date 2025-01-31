@@ -4,7 +4,7 @@ from codegen.sdk.typescript.file import TSFile, TSImport
 from codegen.sdk.enums import ProgrammingLanguage
 
 processed_imports = set()
-@codegen.function("reexport_management"
+@codegen.function("reexport_management")
 def run(codebase: Codebase):
     print("🚀 Starting reexport analysis...")
     for file in codebase.files:

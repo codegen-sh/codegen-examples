@@ -140,7 +140,7 @@ def run(codebase: Codebase):
         if not file.export_statements and len(file.symbols) == 0:
             file.remove()
             print(f"Removed empty file: {file.filepath}")
-    codebase.commit()
+        codebase.commit()
 
 if __name__ == "__main__":
     print("Starting...")

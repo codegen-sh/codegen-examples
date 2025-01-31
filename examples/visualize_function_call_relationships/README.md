@@ -4,50 +4,114 @@ This example demonstrates four different approaches to visualizing code relation
 
 ## Visualization Types
 
-### 1. Function Call Relationships (run_1.py)
-Traces downstream function call relationships from a target method:
-```python
-# Example starting from a specific method
-target_class = codebase.get_class("SharingConfigurationViewSet")
-target_method = target_class.get_method("patch")
-```
-- Shows all functions called by the target method
-- Tracks nested function calls up to a configurable depth
-- Distinguishes between regular functions, methods, and external calls
-- Color codes different types of functions for better visualization
+### 1. Function Call Relationships (`call_trace.py`)
+Traces downstream function call relationships from a target method. This visualization is particularly useful for understanding the flow of execution and identifying complex call chains that might need optimization or refactoring.
 
-### 2. Symbol Dependencies (run_2.py)
-Maps symbol dependencies throughout the codebase:
-```python
-# Example starting from a specific function
-target_func = codebase.get_function("get_query_runner")
-```
-- Visualizes both direct symbol references and imports
-- Tracks relationships between functions, classes, and external modules
-- Prevents circular dependencies through cycle detection
-- Uses distinct colors to differentiate symbol types
+> [!NOTE]
+> View the graph-based visualization created by this script on the `PostHog/posthog` repository [here](codegen.sh/codemod/a433152e-5e8d-4319-8043-19ff2b418869/public/diff).
 
-### 3. Function Blast Radius (run_3.py)
-Shows the impact radius of potential changes:
 ```python
-# Example analyzing impact of changes to a function
-target_func = codebase.get_function("export_asset")
-```
-- Identifies all usages of a target function
-- Highlights HTTP method handlers specially
-- Shows how changes might propagate through the codebase
-- Limited to a configurable maximum depth
+def create_downstream_call_trace(src_func: Function, depth: int = 0):
+    """Creates call graph for parent function by recursively traversing all function calls"""
+    if MAX_DEPTH <= depth:
+        return
+    if isinstance(src_func, ExternalModule):
+        return
 
-### 4. Class Method Relationships (run_4.py)
-Creates a comprehensive view of class method interactions:
-```python
-# Example analyzing an entire class
-target_class = codebase.get_class("_Client")
+    for call in src_func.function_calls:
+        # Skip recursive calls
+        if call.name == src_func.name:
+            continue
+
+        func = call.function_definition
+        if not func:
+            continue
+
+        # Add node and edge to graph with metadata
+        G.add_node(func, name=func_name, color=COLOR_PALETTE.get(func.__class__.__name__))
+        G.add_edge(src_func, func, **generate_edge_meta(call))
+
+        # Recurse for nested calls
+        if isinstance(func, Function):
+            create_downstream_call_trace(func, depth + 1)
 ```
-- Shows all methods within a class
-- Maps relationships between class methods
-- Tracks external function calls
-- Creates a hierarchical visualization of method dependencies
+
+### 2. Symbol Dependencies (`dependency_trace.py`)
+Maps symbol dependencies throughout the codebase. This helps developers identify tightly coupled components and understand the impact of modifying shared dependencies, making it easier to plan architectural changes.
+
+> [!NOTE]
+> View the graph-based visualization created by this script on the `PostHog/posthog` repository [here](codegen.sh/codemod/a433152e-5e8d-4319-8043-19ff2b418869/public/diff).
+
+```python
+def create_dependencies_visualization(symbol: Symbol, depth: int = 0):
+    """Creates a visualization of symbol dependencies in the codebase"""
+    if depth >= MAX_DEPTH:
+        return
+
+    for dep in symbol.dependencies:
+        dep_symbol = None
+        if isinstance(dep, Symbol):
+            dep_symbol = dep
+        elif isinstance(dep, Import):
+            dep_symbol = dep.resolved_symbol if dep.resolved_symbol else None
+
+        if dep_symbol:
+            G.add_node(dep_symbol, color=COLOR_PALETTE.get(dep_symbol.__class__.__name__, "#f694ff"))
+            G.add_edge(symbol, dep_symbol)
+
+            if not isinstance(dep_symbol, Class):
+                create_dependencies_visualization(dep_symbol, depth + 1)
+```
+
+### 3. Function Blast Radius (`blast_radius.py`)
+Shows the impact radius of potential changes. This visualization is invaluable for risk assessment before refactoring, as it reveals all the code paths that could be affected by modifying a particular function or symbol.
+
+> [!NOTE]
+> View the graph-based visualization created by this script on the `PostHog/posthog` repository [here](codegen.sh/codemod/a433152e-5e8d-4319-8043-19ff2b418869/public/diff).
+
+```python
+def create_blast_radius_visualization(symbol: PySymbol, depth: int = 0):
+    """Recursively build a graph visualization showing how a symbol is used"""
+    if depth >= MAX_DEPTH:
+        return
+
+    for usage in symbol.usages:
+        usage_symbol = usage.usage_symbol
+
+        # Color code HTTP methods specially
+        if is_http_method(usage_symbol):
+            color = COLOR_PALETTE.get("HTTP_METHOD")
+        else:
+            color = COLOR_PALETTE.get(usage_symbol.__class__.__name__, "#f694ff")
+
+        G.add_node(usage_symbol, color=color)
+        G.add_edge(symbol, usage_symbol, **generate_edge_meta(usage))
+
+        create_blast_radius_visualization(usage_symbol, depth + 1)
+```
+
+### 4. Class Method Relationships (`method_relationships.py`)
+Creates a comprehensive view of class method interactions. This helps developers understand class cohesion, identify potential god classes, and spot opportunities for breaking down complex classes into smaller, more manageable components.
+
+> [!NOTE]
+> View the graph-based visualization created by this script on the `modal-labs/modal-client` repository [here](https://www.codegen.sh/codemod/66e2e195-ceec-4935-876a-ed4cfc1731c7/public/diff).
+
+```python
+def graph_class_methods(target_class: Class):
+    """Creates a graph visualization of all methods in a class and their call relationships"""
+    G.add_node(target_class, color=COLOR_PALETTE["StartClass"])
+
+    # Add all methods as nodes
+    for method in target_class.methods:
+        method_name = f"{target_class.name}.{method.name}"
+        G.add_node(method, name=method_name, color=COLOR_PALETTE["StartMethod"])
+        visited.add(method)
+        G.add_edge(target_class, method)
+
+    # Create call traces for each method
+    for method in target_class.methods:
+        create_downstream_call_trace(method)
+```
 
 ## Common Features
 
@@ -69,9 +133,7 @@ All visualizations share these characteristics:
 
 3. **Edge Metadata**
    - Tracks file paths
-   - Records source locations
-   - Maintains call relationships
-
+   - Creates data object for visualization
 ## Running the Visualizations
 
 ```bash
@@ -79,32 +141,26 @@ All visualizations share these characteristics:
 pip install codegen networkx
 
 # Run any visualization script
-python run_1.py  # Function call relationships
-python run_2.py  # Symbol dependencies
-python run_3.py  # Function blast radius
-python run_4.py  # Class method relationships
+python call_trace.py      # Function call relationships
+python dependency_trace.py # Symbol dependencies
+python blast_radius.py    # Function blast radius
+python method_relationships.py  # Class method relationships
 ```
 
 Each script will:
 1. Initialize the codebase
-2. Create the appropriate graph
+2. Create the appropriate graph for the relationship
 3. Generate visualization data
-4. Output the graph for viewing in codegen.sh
-
-## Customization Options
-
-Each visualization can be customized through global settings:
-
-```python
-IGNORE_EXTERNAL_MODULE_CALLS = True/False  # Filter external calls
-IGNORE_CLASS_CALLS = True/False           # Filter class references
-MAX_DEPTH = 10                           # Control recursion depth
-```
 
 ## View Results
 
-After running any script, use codegen.sh to view the interactive visualization of the generated graph.
+After running a script, you'll get a graph object containing node and edge relationships. You can view an interactive visualization of the graph through the links above pointing to codegen.sh.
+
+## Learn More
+
+- [Codebase Visualization Documentation](https://docs.codegen.com/tutorials/codebase-visualization)
+- [Codegen Documentation](https://docs.codegen.com)
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests to improve these visualizations!
+Feel free to submit issues and any enhancement requests!

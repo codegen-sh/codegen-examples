@@ -6,7 +6,6 @@ from codegen.sdk.core.detached_symbols.function_call import FunctionCall
 from codegen.sdk.core.function import Function
 from codegen.sdk.core.external_module import ExternalModule
 from codegen.sdk.core.class_definition import Class
-from codegen.sdk.core.interfaces.callable import FunctionCallDefinition
 
 G = nx.DiGraph()
 

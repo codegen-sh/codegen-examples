@@ -112,7 +112,7 @@ def run(codebase: Codebase):
 
 if __name__ == "__main__":
     print("Initializing codebase...")
-    codebase = Codebase.from_repo("codegen-oss/posthog", commit="81941c24897889a2ff2f627c693fa734967e693c", programming_language=ProgrammingLanguage.PYTHON)
+    codebase = Codebase.from_repo("codegen-oss/posthog", commit="b174f2221ea4ae50e715eb6a7e70e9a2b0760800", programming_language=ProgrammingLanguage.PYTHON)
     print(f"Codebase with {len(codebase.files)} files and {len(codebase.functions)} functions.")
     print("Creating graph...")
 

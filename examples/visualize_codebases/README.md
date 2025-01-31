@@ -1,4 +1,4 @@
-# Function Relationship Visualizations
+# Codebase Relationship Visualizations
 
 This example demonstrates four different approaches to visualizing code relationships using Codegen. Each visualization script creates a graph to help developers understand different aspects of code structure and dependencies.
 

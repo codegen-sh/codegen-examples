@@ -1,3 +1,3 @@
-import { Foo, utilFunctionA } from './shared';
+import { Foo, utilFunctionA } from './src/shared';
 
 export { Foo, utilFunctionA }; 

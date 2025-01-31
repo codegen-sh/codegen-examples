@@ -5,23 +5,22 @@ from codegen.sdk.enums import ProgrammingLanguage
 processed_imports = set()
 
 def run(codebase: Codebase):
-    print(len(codebase.files))
     for file in codebase.files:
         
         # Only process files under /src/shared
         if "examples/analize_reexports" not in file.filepath:
             continue
         if '/src/shared' not in file.filepath:
-            print("not in shared")
-            print(file.filepath)
             continue
-
+        
         # Gather all reexports that are not external exports
         all_reexports = []
         for export_stmt in file.export_statements:
             for export in export_stmt.exports:
                 if export.is_reexport() and not export.is_external_export:
                     all_reexports.append(export)
+
+        print(f"all_reexports {len(all_reexports)}")
 
         # Skip if there are none
         if not all_reexports:

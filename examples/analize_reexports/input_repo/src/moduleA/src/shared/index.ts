@@ -1,1 +1,0 @@
-export { barFunction } from '../../../moduleB/reexports'; 

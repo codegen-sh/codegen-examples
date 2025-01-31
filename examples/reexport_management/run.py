@@ -1,6 +1,6 @@
 import codegen
 from codegen import Codebase
-from codegen.sdk.typescript.file import TSFile, TSImport
+from codegen.sdk.typescript.file import TSImport
 from codegen.sdk.enums import ProgrammingLanguage
 
 processed_imports = set()

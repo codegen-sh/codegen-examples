@@ -2,6 +2,9 @@ import codegen
 from codegen import Codebase
 from codegen.sdk.core.detached_symbols.function_call import FunctionCall
 from codegen.sdk.enums import ProgrammingLanguage
+import shutil
+import subprocess
+from pathlib import Path
 
 
 def should_process_join_call(call, soft_delete_models, join_methods):
@@ -52,6 +55,13 @@ def ensure_and_import(file):
         file.add_import_from_import_string("from sqlalchemy import and_")
 
 
+def clone_repo(repo_url: str, repo_path: Path) -> None:
+    """Clone a git repository to the specified path."""
+    if repo_path.exists():
+        shutil.rmtree(repo_path)
+    subprocess.run(["git", "clone", repo_url, str(repo_path)], check=True)
+
+
 @codegen.function("sqlalchemy-soft-delete")
 def process_soft_deletes(codebase):
     """Process soft delete conditions for join methods in the codebase."""
@@ -75,11 +85,21 @@ def process_soft_deletes(codebase):
             print(f"Found join method for model {model_name} in file {file.filepath}")
             add_deleted_at_check(file, call, model_name)
 
+    codebase.commit()
     print("commit")
     print(codebase.get_diff())
 
 
 if __name__ == "__main__":
-    codebase = Codebase.from_repo("hasgeek/funnel", programming_language=ProgrammingLanguage.PYTHON)
-    print(codebase.files)
-    process_soft_deletes(codebase)
+    from codegen.sdk.core.codebase import Codebase
+    from codegen.sdk.codebase.config import CodebaseConfig, GSFeatureFlags
+
+    repo_path = Path("/tmp/core")
+    repo_url = "https://github.com/hasgeek/funnel.git"
+
+    try:
+        clone_repo(repo_url, repo_path)
+        codebase = Codebase(str(repo_path), programming_language=ProgrammingLanguage.PYTHON, config=CodebaseConfig(feature_flags=GSFeatureFlags(disable_graph=True)))
+        process_soft_deletes(codebase)
+    finally:
+        shutil.rmtree(repo_path)

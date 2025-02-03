@@ -15,11 +15,11 @@ The codemod processes your codebase in several steps:
    def should_process_join_call(call, soft_delete_models, join_methods):
        if str(call.name) not in join_methods:
            return False
-       
+
        call_args = list(call.args)
        if not call_args:
            return False
-       
+
        model_name = str(call_args[0].value)
        return model_name in soft_delete_models
    ```
@@ -32,11 +32,11 @@ The codemod processes your codebase in several steps:
    def add_deleted_at_check(file, call, model_name):
        call_args = list(call.args)
        deleted_at_check = f"{model_name}.deleted_at.is_(None)"
-       
+
        if len(call_args) == 1:
            call_args.append(deleted_at_check)
            return
-       
+
        second_arg = call_args[1].value
        if isinstance(second_arg, FunctionCall) and second_arg.name == "and_":
            second_arg.args.append(deleted_at_check)

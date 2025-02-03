@@ -84,24 +84,38 @@ join_methods = {"join", "outerjoin", "innerjoin"}
 
 ## Code Transformations
 
-### Simple Join
+### Simple Join with Model Reference
 ```python
 # Before
-query.join(User)
+query.join(Project, Session.project)
 
 # After
 from sqlalchemy import and_
-query.join(User, User.deleted_at.is_(None))
+query.join(Project, and_(Session.project, Project.deleted_at.is_(None)))
 ```
 
-### Join with Existing Condition
+### Join with Column Equality
 ```python
 # Before
-query.join(User, User.id == Post.user_id)
+query.join(Project, Session.project_id == Project.id)
 
 # After
 from sqlalchemy import and_
-query.join(User, and_(User.id == Post.user_id, User.deleted_at.is_(None)))
+query.join(Project, and_(Session.project_id == Project.id, Project.deleted_at.is_(None)))
+```
+
+### Multiple Joins in Query Chain
+```python
+# Before
+Session.query.join(Project, Session.project)\
+    .join(Account, Project.account)\
+    .outerjoin(Proposal, Session.proposal)
+
+# After
+from sqlalchemy import and_
+Session.query.join(Project, and_(Session.project, Project.deleted_at.is_(None)))\
+    .join(Account, Project.account)\
+    .outerjoin(Proposal, and_(Session.proposal, Proposal.deleted_at.is_(None)))
 ```
 
 ## Graph Disable Mode

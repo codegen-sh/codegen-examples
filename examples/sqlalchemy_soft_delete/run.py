@@ -1,79 +1,85 @@
 import codegen
 from codegen import Codebase
 from codegen.sdk.core.detached_symbols.function_call import FunctionCall
-from codegen.sdk.codebase.config import CodebaseConfig, GSFeatureFlags
+from codegen.sdk.enums import ProgrammingLanguage
 
-codebase = Codebase("./input_repo", config=CodebaseConfig(feature_flags=GSFeatureFlags(disable_graph=True)))
 
-# Values for soft delete models and join methods
-soft_delete_models = {
-    "User",
-    "ProductWorkflow",
-    "TransactionCanonical",
-    "BillParametersLogEntry",
-    "SpendEventCanonical",
-    "TrackingCategory",
-    "Payee",
-    "Card",
-    "ApprovalInstance",
-    "Merchant",
-    "Transaction",
-}
-join_methods = {"join", "outerjoin", "innerjoin"}
+def should_process_join_call(call, soft_delete_models, join_methods):
+    """Determine if a function call should be processed for soft delete conditions."""
+    if str(call.name) not in join_methods:
+        return False
 
-# Loop through all files and function calls
-for file in codebase.files:
-    for call in file.function_calls:
-        # Get the arguments as a list
-        call_args = list(call.args)
+    call_args = list(call.args)
+    if not call_args:
+        return False
 
-        # Skip if the function call is not a join method
-        if str(call.name) not in join_methods:
-            continue
+    model_name = str(call_args[0].value)
+    return model_name in soft_delete_models
 
-        # Skip if the function call has no arguments
-        if len(call_args) == 0:
-            continue
 
-        # Get the model name from the first argument
-        model_name = str(call_args[0].value)
+def add_deleted_at_check(file, call, model_name):
+    """Add the deleted_at check to a join call."""
+    call_args = list(call.args)
+    deleted_at_check = f"{model_name}.deleted_at.is_(None)"
 
-        # Skip if the model name is not in the soft delete models
-        if model_name not in soft_delete_models:
-            continue
+    if len(call_args) == 1:
+        print(f"Adding deleted_at check to function call {call.source}")
+        call_args.append(deleted_at_check)
+        return
 
-        # Construct the deleted_at check expression
-        print(f"Found join method for model {model_name} in file {file.filepath}")
-        deleted_at_check = f"{model_name}.deleted_at.is_(None)"
+    second_arg = call_args[1].value
+    if second_arg.source == deleted_at_check:
+        print(f"Skipping {file.filepath} because the deleted_at check is already present")
+        return
 
-        # If there is only one argument, add the deleted_at check
-        if len(call_args) == 1:
-            print(f"Adding deleted_at check to function call {call.source}")
-            call_args.append(deleted_at_check)
-        elif len(call_args) >= 2:
-            # Get the second argument
-            second_arg = call_args[1].value
+    if isinstance(second_arg, FunctionCall) and second_arg.name == "and_":
+        if deleted_at_check in {str(x) for x in second_arg.args}:
+            print(f"Skipping {file.filepath} because the deleted_at check is already present")
+            return
+        print(f"Adding deleted_at check to and_ call in {file.filepath}")
+        second_arg.args.append(deleted_at_check)
+    else:
+        print(f"Adding deleted_at check to {file.filepath}")
+        call_args[1].edit(f"and_({second_arg.source}, {deleted_at_check})")
 
-            # Skip if the second argument is already the deleted_at check
-            if second_arg.source == deleted_at_check:
-                print(f"Skipping {file.filepath} because the deleted_at check is already present")
+    ensure_and_import(file)
+
+
+def ensure_and_import(file):
+    """Ensure the file has the necessary and_ import."""
+    if not any("and_" in imp.name for imp in file.imports):
+        print(f"File {file.filepath} does not import and_. Adding import.")
+        file.add_import_from_import_string("from sqlalchemy import and_")
+
+
+@codegen.function("sqlalchemy-soft-delete")
+def process_soft_deletes(codebase):
+    """Process soft delete conditions for join methods in the codebase."""
+    soft_delete_models = {
+        "User",
+        "Update",
+        "Proposal",
+        "Comment",
+        "Project",
+        "Team",
+        "SavedSession",
+    }
+    join_methods = {"join", "outerjoin", "innerjoin"}
+
+    for file in codebase.files:
+        for call in file.function_calls:
+            if not should_process_join_call(call, soft_delete_models, join_methods):
                 continue
 
-            # If the second argument is an and_ call, add the deleted_at check if it's not already present
-            if isinstance(second_arg, FunctionCall) and second_arg.name == "and_":
-                if deleted_at_check in {str(x) for x in second_arg.args}:
-                    print(f"Skipping {file.filepath} because the deleted_at check is already present")
-                    continue
-                else:
-                    print(f"Adding deleted_at check to and_ call in {file.filepath}")
-                    second_arg.args.append(deleted_at_check)
-            else:
-                print(f"Adding deleted_at check to {file.filepath}")
-                call_args[1].edit(f"and_({second_arg.source}, {deleted_at_check})")
+            model_name = str(list(call.args)[0].value)
+            print(f"Found join method for model {model_name} in file {file.filepath}")
+            add_deleted_at_check(file, call, model_name)
 
-            # Check if the file imports and_
-            if any("and_" in imp.name for imp in file.imports):
-                print(f"File {file.filepath} imports and_")
-            else:
-                print(f"File {file.filepath} does not import and_. Adding import.")
-                file.add_import_from_import_string("from sqlalchemy import and_")
+    print("commit")
+    print(codebase.get_diff())
+
+
+if __name__ == "__main__":
+    codebase = Codebase.from_repo("hasgeek/funnel", programming_language=ProgrammingLanguage.PYTHON)
+    print(codebase.files)
+    process_soft_deletes(codebase)

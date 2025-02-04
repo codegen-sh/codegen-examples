@@ -185,7 +185,7 @@ def run(codebase: Codebase):
                 print(f"\n      ⚡ Checking method: {method.name}")
                 
                 if method.name not in ("get", "post", "put", "patch", "delete"):
-                    print(f"         ⏩ Skipping - not an HTTP method")
+                    print("         ⏩ Skipping - not an HTTP method")
                     continue
                 
                 # Check existing decorators
@@ -197,7 +197,7 @@ def run(codebase: Codebase):
                 missing_expect = not any(".expect" in d for d in existing_decorators)
                 
                 if not (missing_response or missing_expect):
-                    print(f"         ✅ All decorators present")
+                    print("         ✅ All decorators present")
                     continue
                 
                 print(f"         🔧 Missing decorators - response: {missing_response}, expect: {missing_expect}")

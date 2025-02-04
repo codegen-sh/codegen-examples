@@ -99,6 +99,7 @@ if __name__ == "__main__":
 
     try:
         clone_repo(repo_url, repo_path)
+        subprocess.run(["git", "-C", str(repo_path), "checkout", "8454e15"], check=True)
         codebase = Codebase(str(repo_path), programming_language=ProgrammingLanguage.PYTHON, config=CodebaseConfig(feature_flags=GSFeatureFlags(disable_graph=True)))
         process_soft_deletes(codebase)
     finally:

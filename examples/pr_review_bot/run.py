@@ -24,8 +24,6 @@ def run(codebase: Codebase):
     
     # Prepare context for LLM
     context = {
-        "pr_title": pr.title,
-        "pr_body": pr.body,
         "modified_symbols": [
             {
                 "name": symbol.name,

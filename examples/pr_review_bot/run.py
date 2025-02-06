@@ -6,6 +6,7 @@ github_token = "Your github token"
 open_ai_key = "your open ai key"
 pr_number= 0 # Your PR number must be an integer
 
+codegen.function("pr-review-bot")
 def run(codebase: Codebase):
 
     context_symbols = set()

@@ -1,3 +1,4 @@
+import codegen
 from codegen import Codebase
 from codegen.sdk.enums import ProgrammingLanguage
 from codegen.sdk.codebase.config import CodebaseConfig, GSFeatureFlags, Secrets

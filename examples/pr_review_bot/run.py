@@ -3,13 +3,15 @@ from codegen import Codebase
 from codegen.sdk.enums import ProgrammingLanguage
 from codegen.sdk.codebase.config import CodebaseConfig, GSFeatureFlags, Secrets
 import json
+
 github_token = "Your github token"
 open_ai_key = "your open ai key"
-pr_number= 0 # Your PR number must be an integer
+pr_number = 0  # Your PR number must be an integer
 
 codegen.function("pr-review-bot")
-def run(codebase: Codebase):
 
+
+def run(codebase: Codebase):
     context_symbols = set()
 
     modified_symbols = codebase.get_modified_symbols_in_pr(pr_number)
@@ -17,11 +19,11 @@ def run(codebase: Codebase):
         # Get direct dependencies
         deps = codebase.get_symbol_dependencies(symbol, max_depth=2)
         context_symbols.update(deps)
-        
+
         # Get reverse dependencies (symbols that depend on this one)
-        rev_deps = codebase.get_symbol_dependents(symbol, max_depth=2) 
+        rev_deps = codebase.get_symbol_dependents(symbol, max_depth=2)
         context_symbols.update(rev_deps)
-    
+
     # Prepare context for LLM
     context = {
         "modified_symbols": [
@@ -30,7 +32,8 @@ def run(codebase: Codebase):
                 "type": symbol.symbol_type.value,
                 "filepath": symbol.filepath,
                 "content": symbol.content,
-            } for symbol in modified_symbols
+            }
+            for symbol in modified_symbols
         ],
         "context_symbols": [
             {
@@ -38,24 +41,25 @@ def run(codebase: Codebase):
                 "type": symbol.symbol_type.value,
                 "filepath": symbol.filepath,
                 "content": symbol.content,
-            } for symbol in context_symbols
-        ]
+            }
+            for symbol in context_symbols
+        ],
     }
-    
+
     system_prompt = """
     You are a helpful assistant that reviews pull requests and provides feedback on the code.
     """
     # Generate review using AI
     prompt = f"""Please review this pull request based on the following context:
 
-Title: {context['pr_title']}
-Description: {context['pr_body']}
+Title: {context["pr_title"]}
+Description: {context["pr_body"]}
 
 Modified Symbols:
-{json.dumps(context['modified_symbols'], indent=2)}
+{json.dumps(context["modified_symbols"], indent=2)}
 
 Related Context (Dependencies):
-{json.dumps(context['context_symbols'], indent=2)}
+{json.dumps(context["context_symbols"], indent=2)}
 
 Please provide a thorough code review that includes:
 1. Overall assessment
@@ -65,34 +69,23 @@ Please provide a thorough code review that includes:
 5. Suggestions for testing
 """
 
-    review = codebase.ai_client.llm_query_with_retry(
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt}
-        ],
-        model="gpt-4",
-        max_tokens=2000,
-        temperature=0.7
-    )
+    review = codebase.ai_client.llm_query_with_retry(messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": prompt}], model="gpt-4", max_tokens=2000, temperature=0.7)
     return review
 
 
 if __name__ == "__main__":
     print("Starting codebase analysis...")
     codebase = Codebase.from_repo(
-        'getsentry/sentry', 
+        "getsentry/sentry",
         shallow=False,
-        programming_language=ProgrammingLanguage.PYTHON, 
+        programming_language=ProgrammingLanguage.PYTHON,
         config=CodebaseConfig(
-            secrets=Secrets(
-                openai_key=open_ai_key,
-                github_api_key=github_token
-                
-            ),
+            secrets=Secrets(openai_key=open_ai_key, github_api_key=github_token),
             feature_flags=GSFeatureFlags(
-                sync_enabled=True,          )
-
-    ))
+                sync_enabled=True,
+            ),
+        ),
+    )
     review = run(codebase)
     print(review)
 

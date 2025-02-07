@@ -1,103 +1,69 @@
+import ast
 import codegen
 from codegen.sdk.enums import ProgrammingLanguage
 from codegen import Codebase
+from dataclasses import dataclass, field
+from typing import Any, Optional
 
+def dict_to_dataclass(name: str, dict_source: str) -> str:
+    # Parse the dictionary source to extract keys   
+    dict_ast = ast.literal_eval(dict_source)
+    fields = [f"{key}: Optional[{type(value).__name__}] = None" for key, value in dict_ast.items()]
+    fields_str = "\n    ".join(fields)
+    return f"@dataclass\nclass {name}:\n    {fields_str}\n"
 
 @codegen.function("dict-to-pydantic-schema")
 def run(codebase: Codebase):
-    """Convert dictionary literals to Pydantic models in a Python codebase.
+    """
+    Convert dictionary literals to Pydantic models in a Python codebase.
 
     This codemod:
-    1. Finds all dictionary literals in global variables and class attributes
-    2. Creates corresponding Pydantic models
-    3. Updates the assignments to use the new models
-    4. Adds necessary Pydantic imports
+      1. Finds all dictionary literals in global variables and class attributes
+      2. Prints the call sites where these dictionaries are found
     """
-    # Track statistics
-    files_modified = 0
-    models_created = 0
+    # Track statistics0
+    stats = {
+        'files_modified': 0,
+        'models_created': 0,
+        'call_sites_updated': 0,
+        'key_frequencies': {},
+        'dict_sizes': [],
+    }
 
-    # Iterate through all files in the codebase
     for file in codebase.files:
-        needs_imports = False
-        file_modified = False
-
-        # Look for dictionary assignments in global variables
+        # Process global variables
         for global_var in file.global_vars:
             try:
-                if "{" in global_var.source and "}" in global_var.source:
-                    dict_content = global_var.value.source.strip("{}")
-                    if not dict_content.strip():
-                        continue
-
-                    # Convert dict to Pydantic model
-                    class_name = global_var.name.title() + "Schema"
-                    model_def = f"""class {class_name}(BaseModel):
-    {dict_content.replace(",", "\n    ")}"""
-
-                    print(f"\nConverting '{global_var.name}' to schema")
-                    print("\nOriginal code:")
-                    print(global_var.source)
-                    print("\nNew code:")
-                    print(model_def)
-                    print(f"{class_name}(**{global_var.value.source})")
-                    print("-" * 50)
-
-                    # Insert model and update assignment
-                    global_var.insert_before(model_def + "\n\n")
-                    global_var.set_value(f"{class_name}(**{global_var.value.source})")
-                    needs_imports = True
-                    models_created += 1
-                    file_modified = True
+                if "{" in global_var.value.source and "}" in global_var.value.source:
+                    dict_source = global_var.value.source.strip()
+                    print(f"\n🔍 Found dictionary in global variable '{global_var.name}'")
+                    dataclass_code = dict_to_dataclass(global_var.name, dict_source)
+                    print(dataclass_code)
+                    # Here you would replace the dictionary with the dataclass in the codebase
             except Exception as e:
-                print(f"Error processing global variable {global_var.name}: {str(e)}")
+                pass
 
-        # Look for dictionary assignments in class attributes
+        # Process class attributes
         for cls in file.classes:
             for attr in cls.attributes:
                 try:
-                    if "{" in attr.source and "}" in attr.source:
-                        dict_content = attr.value.source.strip("{}")
-                        if not dict_content.strip():
-                            continue
-
-                        # Convert dict to Pydantic model
-                        class_name = attr.name.title() + "Schema"
-                        model_def = f"""class {class_name}(BaseModel):
-    {dict_content.replace(",", "\n    ")}"""
-
-                        print(f"\nConverting'{attr.name}' to schema")
-                        print("\nOriginal code:")
-                        print(attr.source)
-                        print("\nNew code:")
-                        print(model_def)
-                        print(f"{class_name}(**{attr.value.source})")
-                        print("-" * 50)
-
-                        # Insert model and update attribute
-                        cls.insert_before(model_def + "\n\n")
-                        attr.set_value(f"{class_name}(**{attr.value.source})")
-                        needs_imports = True
-                        models_created += 1
-                        file_modified = True
+                    if "{" in attr.value.source and "}" in attr.value.source:
+                        dict_source = attr.value.source.strip()
+                        print(f"\nConverting attribute '{attr.name}' in class '{cls.name}' to schema")
+                        dataclass_code = dict_to_dataclass(attr.name, dict_source)
+                        print(dataclass_code)
+                        # Here you would replace the dictionary with the dataclass in the codebase
                 except Exception as e:
-                    print(f"Error processing attribute {attr.name} in class {cls.name}: {str(e)}")
+                    pass
 
-        # Add imports if needed
-        if needs_imports:
-            file.add_import_from_import_string("from pydantic import BaseModel")
-
-        if file_modified:
-            files_modified += 1
-
-    print("\nModification complete:")
-    print(f"Files modified: {files_modified}")
-    print(f"Schemas created: {models_created}")
-
+    print("\n✅ Transformation Complete!")
 
 if __name__ == "__main__":
     print("Initializing codebase...")
-    codebase = Codebase.from_repo("modal-labs/modal-client", commit="81941c24897889a2ff2f627c693fa734967e693c", programming_language=ProgrammingLanguage.PYTHON)
+    codebase = Codebase.from_repo(
+        "posthog/posthog",
+        programming_language=ProgrammingLanguage.PYTHON
+    )
 
     print("Running codemod...")
     run(codebase)

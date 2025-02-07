@@ -19,7 +19,7 @@ def get_extended_context(symbol: Symbol, degree: int) -> tuple[set[Symbol], set[
     """Recursively collect dependencies and usages up to the specified degree."""
     dependencies = set()
     usages = set()
-    
+
     if degree > 0:
         for dep in symbol.dependencies:
             if isinstance(dep, Import):
@@ -81,4 +81,4 @@ The script provides detailed progress information:
 - Documenting legacy codebases
 - Maintaining documentation standards in large projects
 - Onboarding new team members with better code documentation
-- Preparing codebases for public release 
+- Preparing codebases for public release

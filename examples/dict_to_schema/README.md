@@ -1,6 +1,6 @@
 # Dict to Schema
 
-This example demonstrates how to automatically convert Python dictionary literals into Pydantic models. The codemod makes this process simple by handling all the tedious manual updates automatically.
+This example demonstrates how to automatically convert Python dictionary literals into dataclasses with proper type hints. The codemod makes this process simple by handling all the tedious manual updates automatically.
 
 ## How the Conversion Script Works
 
@@ -17,9 +17,9 @@ The script (`run.py`) automates the entire conversion process in a few key steps
    - Maintains proper Python indentation
 
 3. **Code Updates**
-   - Inserts new Pydantic models in appropriate locations
-   - Updates dictionary assignments to use the new models
-   - Automatically adds required Pydantic imports
+   - Inserts new dataclass definitions in appropriate locations
+   - Updates dictionary assignments to use the new dataclasses
+   - Automatically adds required imports for dataclasses and typing
 
 ## Example Transformations
 
@@ -29,26 +29,44 @@ The script (`run.py`) automates the entire conversion process in a few key steps
 app_config = {"host": "localhost", "port": 8080}
 
 # After
-class AppConfigSchema(BaseModel):
-    host: str = "localhost"
-    port: int = 8080
+@dataclass
+class AppConfig:
+    host: str | None = None
+    port: int | None = None
 
-app_config = AppConfigSchema(**{"host": "localhost", "port": 8080})
+app_config = AppConfig(host="localhost", port=8080)
+
+# List Example
+books = [
+    {"id": 1, "title": "Book One", "author": "Author A"},
+    {"id": 2, "title": "Book Two", "author": "Author B"}
+]
+
+# After
+@dataclass
+class Book:
+    id: int | None = None
+    title: str | None = None
+    author: str | None = None
+
+books = [Book(**item) for item in books]
 ```
 
 ### Class Attributes
 ```python
 # Before
 class Service:
-    defaults = {"timeout": 30, "retries": 3}
+    defaults = {"timeout": 30, "retries": 3, "backoff": 1.5}
 
 # After
-class DefaultsSchema(BaseModel):
-    timeout: int = 30
-    retries: int = 3
+@dataclass
+class Defaults:
+    timeout: int | None = None
+    retries: int | None = None
+    backoff: float | None = None
 
 class Service:
-    defaults = DefaultsSchema(**{"timeout": 30, "retries": 3})
+    defaults = Defaults(timeout=30, retries=3, backoff=1.5)
 ```
 
 ## Running the Conversion
@@ -63,5 +81,5 @@ codegen run dict_to_schema
 
 ## Learn More
 
-- [Pydantic Documentation](https://docs.pydantic.dev/)
+- [Python Dataclasses Documentation](https://docs.python.org/3/library/dataclasses.html)
 - [Codegen Documentation](https://docs.codegen.com)

@@ -895,8 +895,8 @@ iconType: "solid"
     </Tip>
   </Accordion>
   <Accordion title="Can I use Codegen with my existing tools?" icon="screwdriver-wrench">
-    Yes - [by design](/introduction/guiding-principles#python-first-composability). 
-    
+    Yes - [by design](/introduction/guiding-principles#python-first-composability).
+
     Codegen works like any other python package. It works alongside your IDE, version control system, and other development tools.
   </Accordion>
   <Accordion
@@ -2495,7 +2495,7 @@ for module, imports in module_imports.items():
 
 <Note>
 Always check if imports resolve to external modules before modification to avoid breaking third-party package imports.
-</Note> 
+</Note>
 
 ## Import Statements vs Imports
 
@@ -2697,7 +2697,7 @@ for exp in file.exports:
         # Get original and current symbols
         current = exp.exported_symbol
         original = exp.resolved_symbol
-        
+
         print(f"Re-exporting {original.name} from {exp.from_file.filepath}")
         print(f"Through: {' -> '.join(e.file.filepath for e in exp.export_chain)}")
 ```
@@ -2747,7 +2747,7 @@ for from_file, exports in file_exports.items():
 
 <Note>
 When managing exports, consider the impact on your module's public API. Not all symbols that can be exported should be exported.
-</Note> 
+</Note>
 
 ---
 title: "Inheritable Behaviors"
@@ -3240,9 +3240,9 @@ If `A` depends on `B`, then `B` is used by `A`. This relationship is tracked in 
 
 flowchart LR
     B(BaseClass)
-    
-    
-    
+
+
+
     A(MyClass)
     B ---| used by |A
     A ---|depends on |B
@@ -5565,7 +5565,7 @@ for call in old_api.call_sites:
         f"data={call.get_arg_by_parameter_name('input').value}",
         f"timeout={call.get_arg_by_parameter_name('wait').value}"
     ]
-    
+
     # Replace the old call with the new API
     call.replace(f"new_process_data({', '.join(args)})")
 ```
@@ -5579,10 +5579,10 @@ When updating chained method calls, like database queries or builder patterns:
 for execute_call in codebase.function_calls:
     if execute_call.name != "execute":
         continue
-        
+
     # Get the full chain
     chain = execute_call.call_chain
-    
+
     # Example: Add .timeout() before .execute()
     if "timeout" not in {call.name for call in chain}:
         execute_call.insert_before("timeout(30)")
@@ -5601,45 +5601,45 @@ Here's a comprehensive example:
 ```python
 def migrate_api_v1_to_v2(codebase):
     old_api = codebase.get_function("create_user_v1")
-    
+
     # Document all existing call patterns
     call_patterns = {}
     for call in old_api.call_sites:
         args = [arg.source for arg in call.args]
         pattern = ", ".join(args)
         call_patterns[pattern] = call_patterns.get(pattern, 0) + 1
-    
+
     print("Found call patterns:")
     for pattern, count in call_patterns.items():
         print(f"  {pattern}: {count} occurrences")
-    
+
     # Create new API version
     new_api = old_api.copy()
     new_api.rename("create_user_v2")
-    
+
     # Update parameter types
     new_api.get_parameter("email").type = "EmailStr"
     new_api.get_parameter("role").type = "UserRole"
-    
+
     # Add new required parameters
     new_api.add_parameter("tenant_id: UUID")
-    
+
     # Update all call sites
     for call in old_api.call_sites:
         # Get current arguments
         email_arg = call.get_arg_by_parameter_name("email")
         role_arg = call.get_arg_by_parameter_name("role")
-        
+
         # Build new argument list with type conversions
         new_args = [
             f"email=EmailStr({email_arg.value})",
             f"role=UserRole({role_arg.value})",
             "tenant_id=get_current_tenant_id()"
         ]
-        
+
         # Replace old call with new version
         call.replace(f"create_user_v2({', '.join(new_args)})")
-    
+
     # Add deprecation notice to old version
     old_api.add_decorator('@deprecated("Use create_user_v2 instead")')
 
@@ -5661,10 +5661,10 @@ migrate_api_v1_to_v2(codebase)
    ```python
    # First update parameter names
    param.rename("new_name")
-   
+
    # Then update types
    param.type = "new_type"
-   
+
    # Finally update call sites
    for call in api.call_sites:
        # ... update calls
@@ -5674,7 +5674,7 @@ migrate_api_v1_to_v2(codebase)
    ```python
    # Add new parameter with default
    api.add_parameter("new_param: str = None")
-   
+
    # Later make it required
    api.get_parameter("new_param").remove_default()
    ```
@@ -5689,7 +5689,7 @@ migrate_api_v1_to_v2(codebase)
 
 <Note>
 Remember to test thoroughly after making bulk changes to APIs. While Codegen ensures syntactic correctness, you'll want to verify the semantic correctness of the changes.
-</Note> 
+</Note>
 
 ---
 title: "Organizing Your Codebase"
@@ -5977,16 +5977,16 @@ from collections import defaultdict
 # Create a graph of file dependencies
 def create_dependency_graph():
     G = nx.DiGraph()
-    
+
     for file in codebase.files:
         # Add node for this file
         G.add_node(file.filepath)
-        
+
         # Add edges for each import
         for imp in file.imports:
             if imp.from_file:  # Skip external imports
                 G.add_edge(file.filepath, imp.from_file.filepath)
-    
+
     return G
 
 # Create and analyze the graph
@@ -6015,18 +6015,18 @@ def break_circular_dependency(cycle):
     # Get the first two files in the cycle
     file1 = codebase.get_file(cycle[0])
     file2 = codebase.get_file(cycle[1])
-    
+
     # Create a shared module for common code
     shared_dir = "shared"
     if not codebase.has_directory(shared_dir):
         codebase.create_directory(shared_dir)
-    
+
     # Find symbols used by both files
     shared_symbols = []
     for symbol in file1.symbols:
         if any(usage.file == file2 for usage in symbol.usages):
             shared_symbols.append(symbol)
-    
+
     # Move shared symbols to a new file
     if shared_symbols:
         shared_file = codebase.create_file(f"{shared_dir}/shared_types.py")
@@ -6048,7 +6048,7 @@ def organize_file_imports(file):
     std_lib_imports = []
     third_party_imports = []
     local_imports = []
-    
+
     for imp in file.imports:
         if imp.is_standard_library:
             std_lib_imports.append(imp)
@@ -6056,26 +6056,26 @@ def organize_file_imports(file):
             third_party_imports.append(imp)
         else:
             local_imports.append(imp)
-    
+
     # Sort each group
     for group in [std_lib_imports, third_party_imports, local_imports]:
         group.sort(key=lambda x: x.module_name)
-    
+
     # Remove all existing imports
     for imp in file.imports:
         imp.remove()
-    
+
     # Add imports back in organized groups
     if std_lib_imports:
         for imp in std_lib_imports:
             file.add_import_from_import_string(imp.source)
         file.insert_after_imports("")  # Add newline
-        
+
     if third_party_imports:
         for imp in third_party_imports:
             file.add_import_from_import_string(imp.source)
         file.insert_after_imports("")  # Add newline
-        
+
     if local_imports:
         for imp in local_imports:
             file.add_import_from_import_string(imp.source)
@@ -6094,22 +6094,22 @@ from collections import defaultdict
 
 def analyze_module_coupling():
     coupling_scores = defaultdict(int)
-    
+
     for file in codebase.files:
         # Count unique files imported from
         imported_files = {imp.from_file for imp in file.imports if imp.from_file}
         coupling_scores[file.filepath] = len(imported_files)
-        
+
         # Count files that import this file
-        importing_files = {usage.file for symbol in file.symbols 
+        importing_files = {usage.file for symbol in file.symbols
                          for usage in symbol.usages if usage.file != file}
         coupling_scores[file.filepath] += len(importing_files)
-    
+
     # Sort by coupling score
-    sorted_files = sorted(coupling_scores.items(), 
-                         key=lambda x: x[1], 
+    sorted_files = sorted(coupling_scores.items(),
+                         key=lambda x: x[1],
                          reverse=True)
-    
+
     print("\n🔍 Module Coupling Analysis:")
     print("\nMost coupled files:")
     for filepath, score in sorted_files[:5]:
@@ -6127,9 +6127,9 @@ def extract_shared_code(file, min_usages=3):
     # Find symbols used by multiple files
     for symbol in file.symbols:
         # Get unique files using this symbol
-        using_files = {usage.file for usage in symbol.usages 
+        using_files = {usage.file for usage in symbol.usages
                       if usage.file != file}
-        
+
         if len(using_files) >= min_usages:
             # Create appropriate shared module
             module_name = determine_shared_module(symbol)
@@ -6137,7 +6137,7 @@ def extract_shared_code(file, min_usages=3):
                 shared_file = codebase.create_file(f"shared/{module_name}.py")
             else:
                 shared_file = codebase.get_file(f"shared/{module_name}.py")
-            
+
             # Move symbol to shared module
             symbol.move_to_file(shared_file, strategy="update_all_imports")
 
@@ -7246,7 +7246,7 @@ Let's break down how this works:
         if export.is_reexport() and export.is_default_export():
             print(f"  🔄 Converting default export '{export.name}'")
     ```
-    
+
     The code identifies default exports by checking:
     1. If it's a re-export (`is_reexport()`)
     2. If it's a default export (`is_default_export()`)
@@ -7354,7 +7354,7 @@ for file in codebase.files:
 
     print(f"✨ Fixed exports in {target_file.filepath}")
 
-``` 
+```
 
 ---
 title: "Creating Documentation"
@@ -7443,11 +7443,11 @@ for directory in codebase.directories:
     # Skip test, sql and alembic directories
     if any(x in directory.path.lower() for x in ['test', 'sql', 'alembic']):
         continue
-        
+
     # Get undecorated functions
     funcs = [f for f in directory.functions if not f.is_decorated]
     total = len(funcs)
-    
+
     # Only analyze dirs with >10 functions
     if total > 10:
         documented = sum(1 for f in funcs if f.docstring)
@@ -7462,12 +7462,12 @@ for directory in codebase.directories:
 if dir_stats:
     lowest_dir = min(dir_stats.items(), key=lambda x: x[1]['coverage'])
     path, stats = lowest_dir
-    
+
     print(f"📉 Lowest coverage directory: '{path}'")
     print(f"  • Total functions: {stats['total']}")
     print(f"  • Documented: {stats['documented']}")
     print(f"  • Coverage: {stats['coverage']:.1f}%")
-    
+
     # Print all directory stats for comparison
     print("\n📊 All directory coverage rates:")
     for path, stats in sorted(dir_stats.items(), key=lambda x: x[1]['coverage']):
@@ -8737,7 +8737,7 @@ This skill refactors the given class to be shorter and more readable.
     It uses codebase to first find the class, then uses codebase AI to refactor the class.
     This is a trivial case of using Codebase AI to edit and generate new code that will
     then be applied to the codebase.
-    
+
 ```python
 my_class = codebase.get_symbol("SandboxCodebase", optional=True)
 if my_class is None:
@@ -8762,7 +8762,7 @@ param.type.append("str")
 This code snippet retrieves a function named 'large_function' from the codebase and then uses an AI tool to
     break it up into smaller, more manageable functions. Finally, it edits the original 'large_function' with the
     newly created smaller functions.
-    
+
 ```python
 large_function = codebase.get_function("run_skill_impl_test")
 
@@ -8780,7 +8780,7 @@ large_function.edit(broken_up_function)
 This code snippet retrieves a global variable from a specified file in the codebase, accesses a specific key
     in its dictionary value, and updates that key's value to "xyz". It demonstrates two methods for retrieving the
     value associated with the key "example_key" from the dictionary.
-    
+
 ```python
 
 var = codebase.get_symbol("SHARE_IDEA_TOOL")
@@ -8818,7 +8818,7 @@ global_list.set_value(str(new_value))
 ### Example 8: Rename Global Variable Type Declarations
 Retrieves a global variable 'a' from a specified file in the codebase and prints its resolved type. The
     resolved type is then renamed to 'MyNewType'.
-    
+
 ```python
 a = codebase.get_file("codegen-backend/app/modal_app/sandbox_runners/server/context.py").get_global_var("request_auth")
 # request_auth: ContextVar[str | None] = ...
@@ -8830,7 +8830,7 @@ a.type.rename("NewContextVar")  # Renames the symbol `ContextVar[str | None]` to
 ### Example 9: Check Function Return Type Parameters
 This code snippet retrieves a specific function from a Python file in the codebase and checks if a parameter
     named 'a' is included in the function's return type parameters.
-    
+
 ```python
 function = codebase.get_function("_get_path_to_repo")
 # def function_get_path_to_repo_name(...) -> tuple[str, str]: ...
@@ -8848,7 +8848,7 @@ This skill visualizes the import relationships for a specific file in the codeba
     The skill focuses on a particular file ('path/to/file.py') and analyzes its import statements to construct the graph.
     This visualization helps developers understand the dependencies and structure of imports within the specified file, which can be useful
     for code organization and dependency management.
-    
+
 ```python
 import networkx as nx
 
@@ -8885,7 +8885,7 @@ for file in codebase.files:
 Retrieves the function specified by its name from a given file in the codebase and inspects its return type.
     It prints the resolved symbol of the return type and iterates through the parameters of the return type,
     printing each resolved symbol.
-    
+
 ```python
 # get the class
 trgt_class = codebase.get_class("Codebase")
@@ -8912,7 +8912,7 @@ for file in codebase.files:
 ### Example 14: Append Item to Global List Variable
 This code snippet retrieves a global variable named 'var_name' from a specified file in the codebase and
     appends a new item, 'new_item', to the list stored in that variable.
-    
+
 ```python
 # get the global variable
 var = codebase.get_file("codegen-backend/app/codemod/groupers/constants.py").get_global_var("ALL_GROUPERS")
@@ -8929,7 +8929,7 @@ var.value.append('"NEW_ELEMENT"')
 Iterates through all files in the codebase and processes each function's docstring. If a function already has
     a docstring, it updates it to be more descriptive; otherwise, it adds a new docstring. The updated or newly
     created docstring includes a timestamp indicating when the change was made.
-    
+
 ```python
 subdir = codebase.get_directory("codegen-backend/app/codemod/v3")
 assert subdir
@@ -8963,7 +8963,7 @@ for file in codebase.files:
 Renames a function in the codebase and updates all its call sites. The function is retrieved from a specified
     file, and its name is changed to a new name. After renaming, all call sites that reference the function are
     automatically updated to reflect the new name, and the updated call site source code is printed.
-    
+
 ```python
 # get the function
 function = codebase.get_function("report_install_progress")
@@ -8976,7 +8976,7 @@ function.rename("new_function_name")
 This skill writes a test for the given function.
     This is an example of Codebase AI generating brand new code that will then
     be added to the codebase.
-    
+
 ```python
 my_function = codebase.get_function("report_install_progress", optional=True)
 if my_function is None:
@@ -8990,7 +8990,7 @@ my_function.insert_after(test_function)
 Counts the number of untyped parameters across all functions in the codebase. It iterates through each file
     and each function, summing up the parameters that lack type annotations. Finally, it prints the total count of
     untyped parameters found.
-    
+
 ```python
 untitled_parameters_count = 0
 
@@ -9043,7 +9043,7 @@ for function in codebase.functions:
 ### Example 23: Check Functions For Cache Decorator
 Checks if a specific function in a Python file has a decorator named '@cache'. If the decorator is present,
     it proceeds with further actions (currently a placeholder with 'pass').
-    
+
 ```python
 function = codebase.get_function("get_lint_logs")
 

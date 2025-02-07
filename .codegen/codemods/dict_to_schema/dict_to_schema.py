@@ -39,7 +39,7 @@ def run(codebase: Codebase):
     models_created = 0
 
     # Process all Python files in the codebase
-    total_files = len([f for f in codebase.files if f.path.endswith('.py')])
+    total_files = len([f for f in codebase.files if str(f.path).endswith('.py')])
     print("\n\033[1;36m📁 Scanning files for dictionary literals...\033[0m")
     print(f"Found {total_files} Python files to process")
     
@@ -66,7 +66,7 @@ def run(codebase: Codebase):
         init_code = f"{name} = {class_name}(**{dict_str})"
         return model_def, init_code
 
-    for i, file in enumerate([f for f in codebase.files if f.path.endswith('.py')], 1):
+    for i, file in enumerate([f for f in codebase.files if str(f.path).endswith('.py')], 1):
         needs_imports = False
         file_modified = False
 

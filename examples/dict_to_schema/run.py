@@ -2,7 +2,6 @@ import codegen
 from codegen.sdk.enums import ProgrammingLanguage
 from codegen import Codebase
 import sys
-import time
 
 def print_progress(current: int, total: int, width: int = 40) -> None:
     """Print a progress bar showing current/total progress."""

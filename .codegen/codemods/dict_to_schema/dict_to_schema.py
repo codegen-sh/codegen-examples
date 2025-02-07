@@ -1,9 +1,6 @@
 import codegen
 from codegen import Codebase
-from typing import Dict, Any, List, Union, get_type_hints
-from dataclasses import dataclass
 import sys
-import ast
 
 
 def infer_type(value) -> str:

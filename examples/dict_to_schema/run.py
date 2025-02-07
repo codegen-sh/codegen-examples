@@ -13,16 +13,18 @@ def run(codebase: Codebase):
     3. Updates the assignments to use the new models
     4. Adds necessary Pydantic imports
     """
-    # Track statistics
     files_modified = 0
     models_created = 0
 
-    # Iterate through all files in the codebase
-    for file in codebase.files:
+    total_files = len(codebase.files)
+    print(f"\n📁 Scanning {total_files} files for dictionary literals...")
+    
+    for i, file in enumerate(codebase.files, 1):
         needs_imports = False
         file_modified = False
 
-        # Look for dictionary assignments in global variables
+        print(f"\n🔍 Checking file {i}/{total_files}: {file.path}")
+
         for global_var in file.global_vars:
             try:
                 if "{" in global_var.source and "}" in global_var.source:
@@ -30,29 +32,31 @@ def run(codebase: Codebase):
                     if not dict_content.strip():
                         continue
 
-                    # Convert dict to Pydantic model
                     class_name = global_var.name.title() + "Schema"
                     model_def = f"""class {class_name}(BaseModel):
     {dict_content.replace(",", "\n    ")}"""
 
-                    print(f"\nConverting '{global_var.name}' to schema")
-                    print("\nOriginal code:")
-                    print(global_var.source)
-                    print("\nNew code:")
-                    print(model_def)
-                    print(f"{class_name}(**{global_var.value.source})")
-                    print("-" * 50)
+                    print("\n" + "=" * 60)
+                    print(f"🔄 Converting global variable '{global_var.name}' to schema")
+                    print("=" * 60)
+                    print("📝 Original code:")
+                    print(f"    {global_var.name} = {global_var.value.source}")
+                    print("\n✨ Generated schema:")
+                    print("    " + model_def.replace("\n", "\n    "))
+                    print("\n✅ Updated code:")
+                    print(f"    {global_var.name} = {class_name}(**{global_var.value.source})")
+                    print("=" * 60)
 
-                    # Insert model and update assignment
                     global_var.insert_before(model_def + "\n\n")
                     global_var.set_value(f"{class_name}(**{global_var.value.source})")
                     needs_imports = True
                     models_created += 1
                     file_modified = True
             except Exception as e:
-                print(f"Error processing global variable {global_var.name}: {str(e)}")
+                print(f"\n❌ Error processing global variable '{global_var.name}':")
+                print(f"   {str(e)}")
+                print("   Skipping this variable and continuing...\n")
 
-        # Look for dictionary assignments in class attributes
         for cls in file.classes:
             for attr in cls.attributes:
                 try:
@@ -61,43 +65,55 @@ def run(codebase: Codebase):
                         if not dict_content.strip():
                             continue
 
-                        # Convert dict to Pydantic model
                         class_name = attr.name.title() + "Schema"
                         model_def = f"""class {class_name}(BaseModel):
     {dict_content.replace(",", "\n    ")}"""
 
-                        print(f"\nConverting'{attr.name}' to schema")
-                        print("\nOriginal code:")
-                        print(attr.source)
-                        print("\nNew code:")
-                        print(model_def)
-                        print(f"{class_name}(**{attr.value.source})")
-                        print("-" * 50)
+                        print("\n" + "=" * 60)
+                        print(f"🔄 Converting class attribute '{cls.name}.{attr.name}' to schema")
+                        print("=" * 60)
+                        print("📝 Original code:")
+                        print(f"    class {cls.name}:")
+                        print(f"        {attr.name} = {attr.value.source}")
+                        print("\n✨ Generated schema:")
+                        print("    " + model_def.replace("\n", "\n    "))
+                        print("\n✅ Updated code:")
+                        print(f"    class {cls.name}:")
+                        print(f"        {attr.name} = {class_name}(**{attr.value.source})")
+                        print("=" * 60)
 
-                        # Insert model and update attribute
                         cls.insert_before(model_def + "\n\n")
                         attr.set_value(f"{class_name}(**{attr.value.source})")
                         needs_imports = True
                         models_created += 1
                         file_modified = True
                 except Exception as e:
-                    print(f"Error processing attribute {attr.name} in class {cls.name}: {str(e)}")
+                    print(f"\n❌ Error processing attribute '{attr.name}' in class '{cls.name}':")
+                    print(f"   {str(e)}")
+                    print("   Skipping this attribute and continuing...\n")
 
-        # Add imports if needed
         if needs_imports:
+            print(f"   ➕ Adding Pydantic imports to {file.path}")
             file.add_import_from_import_string("from pydantic import BaseModel")
 
         if file_modified:
+            print(f"   ✅ Successfully modified {file.path}")
             files_modified += 1
 
-    print("\nModification complete:")
-    print(f"Files modified: {files_modified}")
-    print(f"Schemas created: {models_created}")
-
+    print("\n" + "=" * 60)
+    print("📊 Summary of Changes")
+    print("=" * 60)
+    print(f"✨ Files modified: {files_modified}")
+    print(f"🔄 Schemas created: {models_created}")
+    print("=" * 60)
 
 if __name__ == "__main__":
-    print("Initializing codebase...")
-    codebase = Codebase.from_repo("modal-labs/modal-client", commit="81941c24897889a2ff2f627c693fa734967e693c", programming_language=ProgrammingLanguage.PYTHON)
-
-    print("Running codemod...")
+    print("\n🔍 Initializing codebase...")
+    codebase = Codebase.from_repo("fastapi/fastapi", programming_language=ProgrammingLanguage.PYTHON)
+    print("\n🚀 Running dict-to-pydantic-schema codemod...")
+    print("\nℹ️  This codemod will:")
+    print("   1. Find dictionary literals in your code")
+    print("   2. Convert them to Pydantic models")
+    print("   3. Update assignments to use the new models")
+    print("   4. Add required imports\n")
     run(codebase)

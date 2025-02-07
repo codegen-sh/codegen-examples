@@ -1,6 +1,17 @@
 import codegen
 from codegen.sdk.enums import ProgrammingLanguage
 from codegen import Codebase
+import sys
+import time
+
+def print_progress(current: int, total: int, width: int = 40) -> None:
+    """Print a progress bar showing current/total progress."""
+    filled = int(width * current / total)
+    bar = "█" * filled + "░" * (width - filled)
+    percent = int(100 * current / total)
+    print(f"\r[{bar}] {percent}% ({current}/{total})", end="", file=sys.stderr)
+    if current == total:
+        print(file=sys.stderr)
 
 
 @codegen.function("dict-to-pydantic-schema")
@@ -17,13 +28,15 @@ def run(codebase: Codebase):
     models_created = 0
 
     total_files = len(codebase.files)
-    print(f"\n📁 Scanning {total_files} files for dictionary literals...")
+    print("\n\033[1;36m📁 Scanning files for dictionary literals...\033[0m")
+    print(f"Found {total_files} Python files to process")
     
     for i, file in enumerate(codebase.files, 1):
         needs_imports = False
         file_modified = False
 
-        print(f"\n🔍 Checking file {i}/{total_files}: {file.path}")
+        print_progress(i, total_files)
+        print(f"\n\033[1;34m🔍 Processing: {file.path}\033[0m")
 
         for global_var in file.global_vars:
             try:
@@ -36,16 +49,16 @@ def run(codebase: Codebase):
                     model_def = f"""class {class_name}(BaseModel):
     {dict_content.replace(",", "\n    ")}"""
 
-                    print("\n" + "=" * 60)
-                    print(f"🔄 Converting global variable '{global_var.name}' to schema")
-                    print("=" * 60)
-                    print("📝 Original code:")
+                    print("\n" + "═" * 60)
+                    print(f"\033[1;32m🔄 Converting global variable '{global_var.name}' to schema\033[0m")
+                    print("─" * 60)
+                    print("\033[1;34m📝 Original code:\033[0m")
                     print(f"    {global_var.name} = {global_var.value.source}")
-                    print("\n✨ Generated schema:")
+                    print("\n\033[1;35m✨ Generated schema:\033[0m")
                     print("    " + model_def.replace("\n", "\n    "))
-                    print("\n✅ Updated code:")
+                    print("\n\033[1;32m✅ Updated code:\033[0m")
                     print(f"    {global_var.name} = {class_name}(**{global_var.value.source})")
-                    print("=" * 60)
+                    print("═" * 60)
 
                     global_var.insert_before(model_def + "\n\n")
                     global_var.set_value(f"{class_name}(**{global_var.value.source})")
@@ -69,18 +82,18 @@ def run(codebase: Codebase):
                         model_def = f"""class {class_name}(BaseModel):
     {dict_content.replace(",", "\n    ")}"""
 
-                        print("\n" + "=" * 60)
-                        print(f"🔄 Converting class attribute '{cls.name}.{attr.name}' to schema")
-                        print("=" * 60)
-                        print("📝 Original code:")
+                        print("\n" + "═" * 60)
+                        print(f"\033[1;32m🔄 Converting class attribute '{cls.name}.{attr.name}' to schema\033[0m")
+                        print("─" * 60)
+                        print("\033[1;34m📝 Original code:\033[0m")
                         print(f"    class {cls.name}:")
                         print(f"        {attr.name} = {attr.value.source}")
-                        print("\n✨ Generated schema:")
+                        print("\n\033[1;35m✨ Generated schema:\033[0m")
                         print("    " + model_def.replace("\n", "\n    "))
-                        print("\n✅ Updated code:")
+                        print("\n\033[1;32m✅ Updated code:\033[0m")
                         print(f"    class {cls.name}:")
                         print(f"        {attr.name} = {class_name}(**{attr.value.source})")
-                        print("=" * 60)
+                        print("═" * 60)
 
                         cls.insert_before(model_def + "\n\n")
                         attr.set_value(f"{class_name}(**{attr.value.source})")
@@ -100,18 +113,20 @@ def run(codebase: Codebase):
             print(f"   ✅ Successfully modified {file.path}")
             files_modified += 1
 
-    print("\n" + "=" * 60)
-    print("📊 Summary of Changes")
-    print("=" * 60)
-    print(f"✨ Files modified: {files_modified}")
-    print(f"🔄 Schemas created: {models_created}")
-    print("=" * 60)
+    print("\n" + "═" * 60)
+    print("\033[1;35m📊 Summary of Changes\033[0m")
+    print("═" * 60)
+    print(f"\033[1;32m✨ Files modified: {files_modified}\033[0m")
+    print(f"\033[1;32m🔄 Schemas created: {models_created}\033[0m")
+    print("═" * 60)
 
 if __name__ == "__main__":
-    print("\n🔍 Initializing codebase...")
+    print("\n\033[1;36m🔍 Initializing codebase...\033[0m")
+    print("Cloning repository, this may take a moment...")
     codebase = Codebase.from_repo("fastapi/fastapi", programming_language=ProgrammingLanguage.PYTHON)
-    print("\n🚀 Running dict-to-pydantic-schema codemod...")
-    print("\nℹ️  This codemod will:")
+    
+    print("\n\033[1;35m🚀 Running dict-to-pydantic-schema codemod\033[0m")
+    print("\n\033[1;34mℹ️  This codemod will:\033[0m")
     print("   1. Find dictionary literals in your code")
     print("   2. Convert them to Pydantic models")
     print("   3. Update assignments to use the new models")

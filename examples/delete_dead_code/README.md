@@ -51,6 +51,22 @@ pip install codegen
 python run.py
 ```
 
+## Example Output
+
+```
+� Deleting dead code...
+
+🗑️ Removing unused function: _get_parser_doc
+🧹 Removing unused variable: decoded
+🧹 Removing unused variable: shebang_line
+...
+🧹 Removing unused variable: _
+
+🔧 Total functions removed: 2
+📦 Total variables removed: 240
+```
+
+
 ## Learn More
 
 - [Deleting Dead Code](https://docs.codegen.com/tutorials/deleting-dead-code)

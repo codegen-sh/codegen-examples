@@ -30,13 +30,14 @@ def run(codebase: Codebase):
                 var_assignments.remove()
                 removed_variables_count += 1
 
-    print(f"Total functions removed: {removed_functions_count}")
-    print(f"Total variables removed: {removed_variables_count}")
+    print("\n")
+    print(f"🔧 Total functions removed: {removed_functions_count}")
+    print(f"📦 Total variables removed: {removed_variables_count}")
 
 
 if __name__ == "__main__":
     print("🔍 Analyzing codebase...")
     codebase = Codebase.from_repo("tox-dev/tox", programming_language=ProgrammingLanguage.PYTHON)
 
-    print("🚀 Running analysis...")
+    print("🚮 Deleting dead code...")
     run(codebase)

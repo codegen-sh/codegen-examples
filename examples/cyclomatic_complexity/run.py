@@ -1,5 +1,6 @@
 import codegen
 from codegen import Codebase
+from codegen.sdk.enums import ProgrammingLanguage
 from codegen.sdk.core.statements.for_loop_statement import ForLoopStatement
 from codegen.sdk.core.statements.if_block_statement import IfBlockStatement
 from codegen.sdk.core.statements.try_catch_statement import TryCatchStatement
@@ -81,7 +82,7 @@ def run(codebase: Codebase):
 
 if __name__ == "__main__":
     print("🔍 Analyzing codebase...")
-    codebase = Codebase.from_repo("fastapi/fastapi", commit="887270ff8a54bb58c406b0651678a27589793d2f")
+    codebase = Codebase.from_repo("fastapi/fastapi", commit="887270ff8a54bb58c406b0651678a27589793d2f", programming_language=ProgrammingLanguage.PYTHON)
 
     print("Running analysis...")
     run(codebase)

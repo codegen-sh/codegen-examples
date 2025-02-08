@@ -43,15 +43,17 @@ def hop_through_imports(imp: Import) -> Symbol | ExternalModule:
     return imp.imported_symbol
 ```
 
-## Usage
+## Running the Conversion
 
-1. Run the script on a target repository:
-```python
-codebase = Codebase.from_repo("your/repo", commit="commit_hash")
-run(codebase)
+```bash
+# Install Codegen
+pip install codegen
+
+# Run the conversion
+python run.py
 ```
 
-2. The script will:
+The script will:
    - Process each function in the codebase
    - Skip functions that already have docstrings
    - Generate contextually aware docstrings for undocumented functions
@@ -82,3 +84,12 @@ The script provides detailed progress information:
 - Maintaining documentation standards in large projects
 - Onboarding new team members with better code documentation
 - Preparing codebases for public release
+
+## Learn More
+
+- [Creating Documentation](https://docs.codegen.com/tutorials/creating-documentation#creating-documentation)
+- [Codegen Documentation](https://docs.codegen.com)
+
+## Contributing
+
+Feel free to submit issues and enhancement requests!

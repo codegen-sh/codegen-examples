@@ -10,6 +10,7 @@ from generate_codecov_agent_prompt import generate_codecov_agent_prompt
 
 ORG_ID = 1
 
+
 def parse_coverage_xml(xml_file: str) -> dict[str, Any]:
     """Parse the coverage.xml file and extract relevant information.
 

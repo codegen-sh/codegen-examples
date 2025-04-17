@@ -3,10 +3,10 @@ name: Backend Unit Tests
 on:
   push:
     branches:
-      - "develop"
+      - "main"
   pull_request:
     branches:
-      - "develop"
+      - "main"
   workflow_dispatch:
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
         if: ${{ steps.setup.outputs.skip == 'false' }}
         timeout-minutes: 5
         run: |
-          cd codegen-backend
+          cd path/to/your/package
           ENV=staging \
           PYTHONPATH=. \
           uv run pytest \
@@ -35,7 +35,7 @@ jobs:
             -vv \
             --cov \
             --cov-report=xml \
-            codegen_tests
+            path/to/your/tests
 
       - name: Publish Test Report (Unit tests)
         uses: mikepenz/action-junit-report@v4
@@ -53,7 +53,7 @@ jobs:
         uses: codecov/codecov-action@v4.5.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: codegen-backend/coverage.xml
+          file: path/to/your/coverage.xml
           disable_search: true
           name: ${{ github.workflow }}
 
@@ -65,5 +65,5 @@ jobs:
           REPO: ${{ github.repository }}
           TOKEN: ${{ secrets.CODEGEN_AGENT_TOKEN }}
         run: |
-          cd codegen-backend
-          uv run python scripts/process_coverage_report.py coverage.xml $PR_NUMBER $REPO $TOKEN
+          cd path/to/your/package
+          uv run python process_coverage_report.py coverage.xml $PR_NUMBER $REPO $TOKEN

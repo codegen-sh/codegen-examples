@@ -6,17 +6,13 @@ Please view the PR checks, see the codecov report, and **update the PR** to fix 
 
 Please make sure to run the tests you add locally to ensure they are working.
 
-Please do not write tests for the following files:
-- codegen-backend/scripts/process_coverage_report.py
-- codegen-backend/scripts/generate_codecov_agent_prompt.py
-
 DO NOT COMMIT TESTS IF THEY ARE FAILING.
 
-# Here are some commands you can use to run the tests:
+# Use these commands to run the tests:
 
 # Install Python Dependencies
 ```
-cd codegen-backend
+cd path/to/your/package
 uv venv
 source .venv/bin/activate
 uv pip install .
@@ -25,8 +21,8 @@ uv pip install .
 
 # Run Tests
 ```
-chmod +x ./codegen-backend/scripts/codecov_agent_run_test.sh
-cd codegen-backend && ENV=develop ./codegen-backend/scripts/codecov_agent_run_test.sh <optional_test_file_path>
+chmod +x ./run_test.sh
+run_test.sh
 ```
 
 Good luck!
